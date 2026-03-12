@@ -1,0 +1,66 @@
+{
+  "name": "@clawshield/local",
+  "version": "0.1.0",
+  "description": "Local-first trust layer plugin for OpenClaw operators.",
+  "homepage": "https://github.com/cschanhniem/clawshield#readme",
+  "bugs": {
+    "url": "https://github.com/cschanhniem/clawshield/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cschanhniem/clawshield.git"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./openclaw": {
+      "types": "./dist/openclaw.d.ts",
+      "default": "./dist/openclaw.js"
+    }
+  },
+  "openclaw": {
+    "type": "extension",
+    "extensions": [
+      "./dist/openclaw.js"
+    ]
+  },
+  "files": [
+    "dist",
+    "openclaw.plugin.json",
+    "CHANGELOG.md",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.json",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm test",
+    "release:check": "npm test && npm pack --json --pack-destination .tmp/pack",
+    "test": "npm run build && npm run test:source",
+    "test:source": "node --loader ts-node/esm --test test/**/*.test.ts"
+  },
+  "keywords": [
+    "openclaw",
+    "security",
+    "plugin",
+    "local-first",
+    "trust"
+  ],
+  "author": "ClawShield",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "openclaw": "^2026.3.11"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  }
+}
