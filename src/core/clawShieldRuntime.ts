@@ -1,4 +1,5 @@
-import { resolve, sep } from "node:path";
+import { existsSync } from "node:fs";
+import { isAbsolute, resolve, sep } from "node:path";
 import { buildPostureSummary } from "../reporting/postureReport.js";
 import { scanSkillDirectory } from "../scanner/skillScanner.js";
 import type { RiskEvaluation } from "../types/domain.js";
@@ -156,14 +157,20 @@ export class ClawShieldRuntime {
       return buildReply("Provide a path to a skill directory.", true);
     }
 
-    const target = this.safeResolvePath(raw);
-    const report = scanSkillDirectory(target);
-    const headline =
-      report.findings.length > 0
-        ? `${report.findings.length} finding(s), score ${report.score}/100 (${report.severity})`
-        : "No suspicious patterns detected.";
+    try {
+      const target = this.safeResolvePath(raw);
+      const report = scanSkillDirectory(target);
+      const headline =
+        report.findings.length > 0
+          ? `${report.findings.length} finding(s), score ${report.score}/100 (${report.severity})`
+          : "No suspicious patterns detected.";
 
-    return buildReply(`Scanned ${target}. ${headline}`);
+      return buildReply(`Scanned ${target}. ${headline}`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "unknown scan failure";
+      this.api.logger.warn(`clawshield-scan failed: ${message}`);
+      return buildReply(`Scan failed: ${message}`, true);
+    }
   }
 
   private handleExplain(ctx: PluginCommandContext): ReplyPayload {
@@ -231,6 +238,9 @@ export class ClawShieldRuntime {
     }
 
     if (mode === "enforce" && snapshot.evaluation.score >= this.config.holdThreshold) {
+      this.api.logger.warn(
+        `ClawShield blocked ${toolName} for risky session ${sessionKey ?? "unknown"} at ${snapshot.evaluation.score}/100`
+      );
       return {
         block: true,
         blockReason:
@@ -240,9 +250,11 @@ export class ClawShieldRuntime {
     }
 
     if (mode !== "quiet" && snapshot.evaluation.score >= this.config.warnThreshold) {
+      this.api.logger.warn(
+        `ClawShield warning for ${toolName} in session ${sessionKey ?? "unknown"} at ${snapshot.evaluation.score}/100`
+      );
       return {
         block: false,
-        params: undefined,
         blockReason:
           `ClawShield warning: ${toolName} is being called from a risky session ` +
           `(${snapshot.evaluation.score}/100).`
@@ -269,8 +281,12 @@ export class ClawShieldRuntime {
   }
 
   private safeResolvePath(input: string): string {
-    const resolved = resolve(this.api.resolvePath(input));
-    const cwd = resolve(this.api.resolvePath("."));
+    const resolved = isAbsolute(input)
+      ? resolve(input)
+      : existsSync(resolve(process.cwd(), input))
+        ? resolve(process.cwd(), input)
+        : resolve(this.api.resolvePath(input));
+    const cwd = resolve(process.cwd());
     if (!resolved.startsWith(cwd + sep) && resolved !== cwd) {
       this.api.logger.warn(`scan target resolved outside workspace: ${resolved}`);
     }

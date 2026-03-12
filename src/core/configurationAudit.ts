@@ -37,6 +37,21 @@ export function assessOpenClawConfiguration(config: OpenClawConfigLike): Finding
         }
       })
     );
+  } else if (!pluginsAllow.includes("clawshield-local")) {
+    findings.push(
+      buildConfigFinding({
+        id: "cfg-plugin-not-allowlisted",
+        title: "ClawShield is not included in the plugin allowlist",
+        category: "configuration",
+        score: 26,
+        evidence: [JSON.stringify(pluginsAllow)],
+        rationale: "An explicit allowlist that omits ClawShield undermines predictable loading and trust posture.",
+        remediation: {
+          summary: "Add ClawShield to the trusted plugin inventory.",
+          action: 'Include "clawshield-local" in plugins.allow.'
+        }
+      })
+    );
   }
 
   const execSecurity = readPath(config, "exec.security");
@@ -94,7 +109,13 @@ export function assessOpenClawConfiguration(config: OpenClawConfigLike): Finding
   }
 
   const toolsProfile = readPath(config, "tools.profile");
-  if (typeof toolsProfile !== "string" || toolsProfile.length === 0) {
+  const toolsAllow = readPath(config, "tools.allow");
+  const toolsDeny = readPath(config, "tools.deny");
+  const hasExplicitToolControls =
+    (Array.isArray(toolsAllow) && toolsAllow.length > 0) ||
+    (Array.isArray(toolsDeny) && toolsDeny.length > 0);
+
+  if ((typeof toolsProfile !== "string" || toolsProfile.length === 0) && !hasExplicitToolControls) {
     findings.push(
       buildConfigFinding({
         id: "cfg-tools-profile",

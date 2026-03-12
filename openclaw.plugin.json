@@ -28,6 +28,29 @@
         "type": "number",
         "minimum": 0,
         "default": 300000
+      },
+      "cacheSize": {
+        "type": "number",
+        "minimum": 1,
+        "default": 256
+      },
+      "incidentTtlMs": {
+        "type": "number",
+        "minimum": 60000,
+        "default": 86400000
+      },
+      "maxDigestFindings": {
+        "type": "number",
+        "minimum": 1,
+        "maximum": 20,
+        "default": 5
+      },
+      "dangerousToolPatterns": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "default": ["exec", "shell", "bash", "terminal", "computer", "browser"]
       }
     }
   },
@@ -49,6 +72,26 @@
     "throttleWindowMs": {
       "label": "Throttle Window",
       "help": "Suppress duplicate warnings for the same conversation within this window",
+      "advanced": true
+    },
+    "cacheSize": {
+      "label": "Cache Size",
+      "help": "Maximum number of prompt evaluations kept in memory",
+      "advanced": true
+    },
+    "incidentTtlMs": {
+      "label": "Incident TTL",
+      "help": "How long recent incidents and session risk remain active",
+      "advanced": true
+    },
+    "maxDigestFindings": {
+      "label": "Digest Size",
+      "help": "Maximum number of recent incidents shown in status output",
+      "advanced": true
+    },
+    "dangerousToolPatterns": {
+      "label": "Dangerous Tools",
+      "help": "Tool-name fragments treated as high-impact in risky sessions",
       "advanced": true
     }
   }

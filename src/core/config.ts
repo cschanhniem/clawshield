@@ -46,7 +46,13 @@ function readNumber(
 
 export function validateClawShieldConfig(value: unknown): { ok: true; value: ClawShieldConfig } | { ok: false; errors: string[] } {
   if (value === undefined) {
-    return { ok: true, value: { ...defaultClawShieldConfig } };
+    return {
+      ok: true,
+      value: {
+        ...defaultClawShieldConfig,
+        dangerousToolPatterns: [...defaultClawShieldConfig.dangerousToolPatterns]
+      }
+    };
   }
 
   if (!isObject(value)) {
@@ -54,7 +60,10 @@ export function validateClawShieldConfig(value: unknown): { ok: true; value: Cla
   }
 
   const errors: string[] = [];
-  const next: ClawShieldConfig = { ...defaultClawShieldConfig };
+  const next: ClawShieldConfig = {
+    ...defaultClawShieldConfig,
+    dangerousToolPatterns: [...defaultClawShieldConfig.dangerousToolPatterns]
+  };
 
   if (value.mode !== undefined) {
     if (value.mode === "observe" || value.mode === "enforce" || value.mode === "quiet") {

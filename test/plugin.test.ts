@@ -76,3 +76,20 @@ test("scan command reports suspicious skill bundles", async () => {
 
   assert.match(result?.text ?? "", /finding/);
 });
+
+test("scan command fails cleanly for missing paths", async () => {
+  const api = createMockApi();
+  await clawShieldPluginDefinition.register(api);
+  const scanCommand = api.commands.find((command) => command.name === "clawshield-scan");
+
+  const result = await scanCommand?.handler({
+    channel: "telegram",
+    commandBody: "clawshield-scan missing-dir",
+    args: "missing-dir",
+    config: {},
+    isAuthorizedSender: true
+  });
+
+  assert.equal(result?.isError, true);
+  assert.match(result?.text ?? "", /Scan failed/);
+});

@@ -28,27 +28,40 @@ function redactStringValue(value: string): { value: string; changed: boolean } {
   };
 }
 
-export function redactUnknownValue(value: unknown): UnknownRedactionResult {
+export function redactUnknownValue(value: unknown, seen = new WeakMap<object, unknown>()): UnknownRedactionResult {
   if (typeof value === "string") {
     const result = redactStringValue(value);
     return { value: result.value, sanitized: result.changed };
   }
 
   if (Array.isArray(value)) {
+    const existing = seen.get(value);
+    if (existing) {
+      return { value: existing, sanitized: false };
+    }
+
+    const next: unknown[] = [];
+    seen.set(value, next);
     let changed = false;
-    const next = value.map((entry) => {
-      const result = redactUnknownValue(entry);
+    for (const entry of value) {
+      const result = redactUnknownValue(entry, seen);
       changed ||= result.sanitized;
-      return result.value;
-    });
+      next.push(result.value);
+    }
     return { value: next, sanitized: changed };
   }
 
   if (typeof value === "object" && value !== null) {
+    const existing = seen.get(value);
+    if (existing) {
+      return { value: existing, sanitized: false };
+    }
+
     let changed = false;
     const next: Record<string, unknown> = {};
+    seen.set(value, next);
     for (const [key, entry] of Object.entries(value)) {
-      const result = redactUnknownValue(entry);
+      const result = redactUnknownValue(entry, seen);
       changed ||= result.sanitized;
       next[key] = result.value;
     }
