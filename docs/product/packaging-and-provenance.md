@@ -51,8 +51,9 @@ A small, inspectable artifact is not cosmetic. It is part of the product promise
 ## Provenance Notes
 
 - Prefer reproducible builds from tagged commits.
-- Publish from GitHub Actions with `npm publish --provenance` when possible.
-- If npm account security requires 2FA for writes, use an automation token or trusted publishing instead of a standard token that still prompts for OTP.
+- Prefer npm trusted publishing for GitHub Actions releases. npm automatically generates provenance for public packages from public repositories when trusted publishing is configured.
+- Keep the workflow filename stable. npm trusted publisher matching is exact and case-sensitive.
+- If trusted publishing is temporarily unavailable for first release setup, use a one-time automation token rather than a standard token that still prompts for OTP.
 - Keep dependency count visible in release notes and README copy.
 - Call out any new hook usage, blocking behavior, or config surface in every release.
 - Make verification easy enough that users actually do it.
