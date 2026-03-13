@@ -31,7 +31,7 @@ If you are searching for an OpenClaw security plugin, OpenClaw prompt injection 
 After publication:
 
 ```bash
-openclaw plugins install clawseatbelt@0.1.1
+openclaw plugins install clawseatbelt@0.1.2
 openclaw config set --strict-json plugins.allow '["clawseatbelt"]'
 openclaw config set --strict-json plugins.entries.clawseatbelt.enabled true
 ```

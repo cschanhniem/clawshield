@@ -1,5 +1,11 @@
 # ClawSeatbelt Changelog
 
+## 0.1.2
+
+- Fixed package-artifact verification on fresh runners by making `npm run pack:artifact` create `.tmp/pack` before calling `npm pack`.
+- Switched CI and release-check docs to the self-sufficient pack command so local rehearsal and GitHub verification use the same path.
+- Refreshed pinned install and release docs for the `0.1.2` cut from current `main`.
+
 ## 0.1.1
 
 - Added a local-first OpenClaw deployment flow with `deploy:local` and `deploy:local:pack`.

@@ -7,7 +7,7 @@ This is the fastest path to a safer OpenClaw setup with ClawSeatbelt.
 Once the package is published:
 
 ```bash
-openclaw plugins install clawseatbelt@0.1.1
+openclaw plugins install clawseatbelt@0.1.2
 openclaw config set --strict-json plugins.allow '["clawseatbelt"]'
 openclaw config set --strict-json plugins.entries.clawseatbelt.enabled true
 ```

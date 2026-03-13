@@ -1,6 +1,6 @@
 {
   "name": "clawseatbelt",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "OpenClaw security plugin for local-first prompt injection defense, skill scanning, transcript redaction, and posture reporting.",
   "homepage": "https://github.com/cschanhniem/ClawSeatbelt#readme",
   "bugs": {

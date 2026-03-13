@@ -37,7 +37,7 @@ ClawSeatbelt helps OpenClaw users run agents with fewer blind spots. It scores r
 ## Install
 
 ```bash
-openclaw plugins install clawseatbelt@0.1.1
+openclaw plugins install clawseatbelt@0.1.2
 ```
 
 ## Maintenance Signals
