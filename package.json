@@ -2,13 +2,13 @@
   "name": "clawseatbelt",
   "version": "0.1.0",
   "description": "OpenClaw security plugin for local-first prompt injection defense, skill scanning, transcript redaction, and posture reporting.",
-  "homepage": "https://github.com/cschanhniem/clawshield#readme",
+  "homepage": "https://github.com/cschanhniem/ClawSeatbelt#readme",
   "bugs": {
-    "url": "https://github.com/cschanhniem/clawshield/issues"
+    "url": "https://github.com/cschanhniem/ClawSeatbelt/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cschanhniem/clawshield.git"
+    "url": "git+https://github.com/cschanhniem/ClawSeatbelt.git"
   },
   "type": "module",
   "main": "dist/index.js",
@@ -30,18 +30,32 @@
     ]
   },
   "files": [
-    "dist",
+    "dist/core",
+    "dist/reporting",
+    "dist/rules",
+    "dist/scanner",
+    "dist/types",
+    "dist/index.js",
+    "dist/index.d.ts",
+    "dist/openclaw.js",
+    "dist/openclaw.d.ts",
     "openclaw.plugin.json",
+    "LICENSE",
     "CHANGELOG.md",
     "README.md"
   ],
   "scripts": {
     "build": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.json",
+    "benchmark:local": "npm run build && node dist/benchmark/runLocalBenchmark.js",
+    "benchmark:competitors": "node scripts/run-competitor-lab.mjs",
+    "benchmark:competitors:docs": "node scripts/run-competitor-lab.mjs --write-docs",
     "prepack": "npm run build",
-    "prepublishOnly": "npm test",
-    "release:check": "npm test && npm pack --json --pack-destination .tmp/pack",
+    "prepublishOnly": "npm test && npm run verify:openclaw-lab",
+    "release:check": "npm test && npm run verify:openclaw-lab && npm pack --json --pack-destination .tmp/pack",
     "test": "npm run build && npm run test:source",
-    "test:source": "node --loader ts-node/esm --test test/**/*.test.ts"
+    "test:source": "node --loader ts-node/esm --test test/**/*.test.ts test/**/*.test.mjs",
+    "verify:openclaw-lab": "node scripts/verify-openclaw-lab.mjs",
+    "verify:openclaw-lab:docs": "node scripts/verify-openclaw-lab.mjs --write-docs"
   },
   "keywords": [
     "openclaw",

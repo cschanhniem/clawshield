@@ -43,6 +43,18 @@ const replacementRules: ReplacementRule[] = [
     remediation: {
       summary: "Persist only token metadata, never the token body."
     }
+  },
+  {
+    id: "secret-generic-long-value",
+    title: "Detected long secret-style value",
+    pattern:
+      /\b(?:api[_-]?key|secret|secret[_-]?key|access[_-]?key|aws_secret_access_key|token)\b\s*[:=]\s*[A-Za-z0-9\/+=_-]{24,}\b/gi,
+    replacement: "[REDACTED_SECRET]",
+    score: 30,
+    rationale: "Long secret-like values in key-value form are likely credentials and should not persist in transcripts.",
+    remediation: {
+      summary: "Replace raw secrets with references or metadata before persisting output."
+    }
   }
 ];
 
@@ -56,7 +68,15 @@ export function applyRedactionRules(input: string): { sanitized: string; finding
       continue;
     }
 
-    sanitized = sanitized.replace(rule.pattern, rule.replacement);
+    sanitized = sanitized.replace(rule.pattern, (match) => {
+      if (rule.id === "secret-generic-long-value") {
+        const parts = match.split(/([:=])/, 3);
+        const prefix = parts[0]?.trim() ?? "secret";
+        const separator = parts[1] ?? "=";
+        return `${prefix} ${separator} [REDACTED_SECRET]`;
+      }
+      return rule.replacement;
+    });
     findings.push({
       id: rule.id,
       title: rule.title,

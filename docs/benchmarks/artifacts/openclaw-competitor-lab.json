@@ -1,0 +1,225 @@
+{
+  "generatedAt": "2026-03-12T18:04:51.062Z",
+  "openclawVersion": "2026.3.11",
+  "entries": [
+    {
+      "label": "ClawSeatbelt",
+      "packageName": "clawseatbelt",
+      "version": "0.1.0",
+      "homepage": "https://github.com/cschanhniem/ClawSeatbelt#readme",
+      "description": "Local-first trust plugin for OpenClaw",
+      "installKind": "local-tarball",
+      "package": {
+        "filename": "clawseatbelt-0.1.0.tgz",
+        "packedBytes": 31351,
+        "unpackedBytes": 128091,
+        "entryCount": 49
+      },
+      "plugin": {
+        "id": "clawseatbelt",
+        "status": "loaded",
+        "origin": "global",
+        "hookCount": 5,
+        "commandCount": 7,
+        "serviceCount": 1,
+        "cliCommandCount": 0,
+        "toolCount": 0,
+        "configSchema": true
+      },
+      "install": {
+        "durationMs": 2389,
+        "allowlistPinned": true,
+        "installRecordPresent": true
+      },
+      "signals": {
+        "dangerousPatterns": false,
+        "cloudService": false,
+        "serverDependency": false,
+        "manifestIdMismatch": false,
+        "installsDependencies": false,
+        "provenanceWarning": false,
+        "allowlistWarning": false,
+        "localFirstBaseline": true,
+        "notes": []
+      }
+    },
+    {
+      "label": "MoltGuard",
+      "packageName": "@openguardrails/moltguard",
+      "version": "6.8.21",
+      "homepage": "https://github.com/openguardrails/openguardrails/tree/main/moltguard#readme",
+      "description": "AI agent security plugin for OpenClaw: prompt injection detection, PII sanitization, and monitoring dashboard",
+      "installKind": "npm",
+      "package": {
+        "filename": "openguardrails-moltguard-6.8.21.tgz",
+        "packedBytes": 1697329,
+        "unpackedBytes": 7095680,
+        "entryCount": 259
+      },
+      "plugin": {
+        "id": "moltguard",
+        "status": "loaded",
+        "origin": "global",
+        "hookCount": 24,
+        "commandCount": 9,
+        "serviceCount": 0,
+        "cliCommandCount": 0,
+        "toolCount": 0,
+        "configSchema": true
+      },
+      "install": {
+        "durationMs": 17113,
+        "allowlistPinned": true,
+        "installRecordPresent": true
+      },
+      "signals": {
+        "dangerousPatterns": false,
+        "cloudService": true,
+        "serverDependency": false,
+        "manifestIdMismatch": false,
+        "installsDependencies": true,
+        "provenanceWarning": false,
+        "allowlistWarning": false,
+        "localFirstBaseline": false,
+        "notes": [
+          "Package shows hosted-service or account-linked behavior in default install signals."
+        ]
+      }
+    },
+    {
+      "label": "SecureClaw",
+      "packageName": "@adversa/secureclaw",
+      "version": "2.2.0",
+      "homepage": "https://github.com/adversa-ai/secureclaw#readme",
+      "description": "Automated security hardening plugin for OpenClaw",
+      "installKind": "npm",
+      "package": {
+        "filename": "adversa-secureclaw-2.2.0.tgz",
+        "packedBytes": 102921,
+        "unpackedBytes": 471768,
+        "entryCount": 97
+      },
+      "plugin": {
+        "id": "secureclaw",
+        "status": "loaded",
+        "origin": "global",
+        "hookCount": 1,
+        "commandCount": 1,
+        "serviceCount": 3,
+        "cliCommandCount": 1,
+        "toolCount": 0,
+        "configSchema": true
+      },
+      "install": {
+        "durationMs": 12647,
+        "allowlistPinned": true,
+        "installRecordPresent": true
+      },
+      "signals": {
+        "dangerousPatterns": true,
+        "cloudService": false,
+        "serverDependency": false,
+        "manifestIdMismatch": false,
+        "installsDependencies": true,
+        "provenanceWarning": false,
+        "allowlistWarning": false,
+        "localFirstBaseline": true,
+        "notes": [
+          "OpenClaw installer flagged dangerous code patterns in the shipped plugin artifact."
+        ]
+      }
+    },
+    {
+      "label": "PolicyShield",
+      "packageName": "@policyshield/openclaw-plugin",
+      "version": "0.14.0",
+      "homepage": "https://github.com/mishabar410/PolicyShield/tree/main/plugins/openclaw#readme",
+      "description": "PolicyShield plugin for OpenClaw — runtime tool call policy enforcement",
+      "installKind": "npm",
+      "package": {
+        "filename": "policyshield-openclaw-plugin-0.14.0.tgz",
+        "packedBytes": 6999,
+        "unpackedBytes": 24152,
+        "entryCount": 9
+      },
+      "plugin": {
+        "id": "policyshield",
+        "status": "loaded",
+        "origin": "global",
+        "hookCount": 3,
+        "commandCount": 0,
+        "serviceCount": 0,
+        "cliCommandCount": 0,
+        "toolCount": 0,
+        "configSchema": true
+      },
+      "install": {
+        "durationMs": 1513,
+        "allowlistPinned": true,
+        "installRecordPresent": true
+      },
+      "signals": {
+        "dangerousPatterns": false,
+        "cloudService": false,
+        "serverDependency": true,
+        "manifestIdMismatch": false,
+        "installsDependencies": false,
+        "provenanceWarning": false,
+        "allowlistWarning": false,
+        "localFirstBaseline": false,
+        "notes": [
+          "Package expects a reachable policy or control-plane server for full behavior."
+        ]
+      }
+    },
+    {
+      "label": "Berry Shield",
+      "packageName": "@f4bioo/berry-shield",
+      "version": "2026.3.3-2",
+      "homepage": "https://github.com/F4bioo/berry-shield#readme",
+      "description": "OpenClaw plugin for policy checks, command/file blocking, and sensitive-data redaction.",
+      "installKind": "npm",
+      "package": {
+        "filename": "f4bioo-berry-shield-2026.3.3-2.tgz",
+        "packedBytes": 111332,
+        "unpackedBytes": 455047,
+        "entryCount": 53
+      },
+      "plugin": {
+        "id": "berry-shield",
+        "status": "loaded",
+        "origin": "global",
+        "hookCount": 13,
+        "commandCount": 1,
+        "serviceCount": 0,
+        "cliCommandCount": 1,
+        "toolCount": 1,
+        "configSchema": true
+      },
+      "install": {
+        "durationMs": 20639,
+        "allowlistPinned": true,
+        "installRecordPresent": true
+      },
+      "signals": {
+        "dangerousPatterns": true,
+        "cloudService": false,
+        "serverDependency": false,
+        "manifestIdMismatch": false,
+        "installsDependencies": true,
+        "provenanceWarning": false,
+        "allowlistWarning": false,
+        "localFirstBaseline": true,
+        "notes": [
+          "OpenClaw installer flagged dangerous code patterns in the shipped plugin artifact."
+        ]
+      }
+    }
+  ],
+  "categoryVerdict": {
+    "localBaselineWinner": "ClawSeatbelt currently leads the local-first baseline on install-path evidence.",
+    "cleanLocalInstallWinner": "ClawSeatbelt currently leads the clean local install story in this run.",
+    "cleanInstallWinner": "PolicyShield currently leads the clean-install artifact story in this run.",
+    "publicationGap": "ClawSeatbelt still lacks a public npm release, so category leadership is not fully proven until the package is published."
+  }
+}

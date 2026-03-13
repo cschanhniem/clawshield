@@ -12,7 +12,15 @@ test("plugin registers commands, service, and hooks", async () => {
 
   assert.deepEqual(
     api.commands.map((command) => command.name).sort(),
-    ["clawseatbelt-explain", "clawseatbelt-mode", "clawseatbelt-scan", "clawseatbelt-status"]
+    [
+      "clawseatbelt-answer",
+      "clawseatbelt-challenge",
+      "clawseatbelt-explain",
+      "clawseatbelt-mode",
+      "clawseatbelt-proofpack",
+      "clawseatbelt-scan",
+      "clawseatbelt-status"
+    ]
   );
   assert.equal(api.services.length, 1);
   assert.ok(api.hooks.before_prompt_build);
@@ -77,6 +85,8 @@ test("scan command reports suspicious skill bundles", async () => {
   });
 
   assert.match(result?.text ?? "", /finding/);
+  assert.match(result?.text ?? "", /Top findings:/);
+  assert.match(result?.text ?? "", /First action:/);
 });
 
 test("scan command fails cleanly for missing paths", async () => {
@@ -164,4 +174,101 @@ test("status command exports json posture and writes snapshots", async () => {
   assert.equal(payload.posture?.audit?.sourcePath, auditPath);
   assert.ok(payload.diff?.introducedFindingIds.includes("audit-audit.tools.full"));
   assert.equal(writtenSnapshot.formatVersion, 1);
+});
+
+test("proofpack command renders a public-safe packet and writes it to disk", async () => {
+  const root = mkdtempSync(join(tmpdir(), "clawseatbelt-proofpack-"));
+  const auditPath = join(root, "audit.json");
+  const outputPath = join(root, "proofpack.md");
+
+  writeFileSync(
+    auditPath,
+    JSON.stringify({
+      findings: [
+        {
+          id: "audit.tools.full",
+          title: "tools.profile is full",
+          severity: "high",
+          status: "failed",
+          evidence: [
+            {
+              path: "/Users/james/private/secret.env",
+              value: "sk-1234567890123456789012"
+            }
+          ],
+          remediation: {
+            summary: "Use a narrower tool profile.",
+            action: "Set tools.profile to local or deny exec by default."
+          }
+        }
+      ]
+    }),
+    "utf8"
+  );
+
+  const api = createMockApi({
+    config: {
+      plugins: { allow: ["clawseatbelt"] }
+    }
+  });
+  await clawSeatbeltPluginDefinition.register(api);
+  const proofpackCommand = api.commands.find((command) => command.name === "clawseatbelt-proofpack");
+
+  const result = await proofpackCommand?.handler({
+    channel: "telegram",
+    commandBody: "clawseatbelt-proofpack",
+    args: `--audit-file "${auditPath}" --scan-path "${join("test", "fixtures", "skills", "malicious")}" --audience public --target pr-comment --write-file "${outputPath}"`,
+    config: {},
+    isAuthorizedSender: true
+  });
+
+  const written = readFileSync(outputPath, "utf8");
+  rmSync(root, { recursive: true, force: true });
+
+  assert.match(result?.text ?? "", /ClawSeatbelt Proof Pack/);
+  assert.match(result?.text ?? "", /Skill Approval Memo/);
+  assert.match(result?.text ?? "", /openclaw plugins install clawseatbelt@0\.1\.0/);
+  assert.match(result?.text ?? "", /\[REDACTED_PATH:secret\.env\]/);
+  assert.match(result?.text ?? "", /\[REDACTED_API_KEY\]/);
+  assert.equal(written.endsWith("\n"), true);
+});
+
+test("answer command renders a concise recommendation backed by local proof", async () => {
+  const api = createMockApi({
+    config: {
+      plugins: { allow: ["clawseatbelt"] }
+    }
+  });
+  await clawSeatbeltPluginDefinition.register(api);
+  const answerCommand = api.commands.find((command) => command.name === "clawseatbelt-answer");
+
+  const result = await answerCommand?.handler({
+    channel: "telegram",
+    commandBody: "clawseatbelt-answer",
+    args: "--target team --audience public",
+    config: {},
+    isAuthorizedSender: true
+  });
+
+  assert.match(result?.text ?? "", /team baseline trust/i);
+  assert.match(result?.text ?? "", /openclaw plugins install clawseatbelt@0\.1\.0/);
+  assert.match(result?.text ?? "", /judge the attached proof pack/i);
+});
+
+test("challenge command renders a first-proof report", async () => {
+  const api = createMockApi();
+  await clawSeatbeltPluginDefinition.register(api);
+  const challengeCommand = api.commands.find((command) => command.name === "clawseatbelt-challenge");
+
+  const result = await challengeCommand?.handler({
+    channel: "telegram",
+    commandBody: "clawseatbelt-challenge",
+    args: "--target chat --audience public",
+    config: {},
+    isAuthorizedSender: true
+  });
+
+  assert.match(result?.text ?? "", /trust challenge/i);
+  assert.match(result?.text ?? "", /message scoring, transcript hygiene, and skill inspection/i);
+  assert.match(result?.text ?? "", /openclaw plugins install clawseatbelt@0\.1\.0/);
 });

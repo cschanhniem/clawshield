@@ -14,20 +14,23 @@ ClawSeatbelt should keep winning the second test:
 
 ## Current Package Shape
 
-Artifact verification was run locally on 2026-03-12 using:
+Artifact verification was run locally on 2026-03-13 using:
 
 - `npm test`
+- `npm run verify:openclaw-lab`
 - `npm pack --json --pack-destination .tmp/pack`
 - `tar -tf .tmp/pack/clawseatbelt-0.1.0.tgz`
 
 Verified package facts:
 
 - package: `clawseatbelt@0.1.0`
-- tarball size: about `23.8 KB`
-- built `dist/` footprint in this workspace: about `180 KB`
-- unpacked published package footprint: about `92.6 KB`
+- tarball size: about `31.3 KB`
+- built `dist/` footprint in this workspace: about `260 KB`
+- unpacked published package footprint: about `127.7 KB`
 - OpenClaw entry path: `dist/openclaw.js`
 - peer dependency: `openclaw ^2026.3.11`
+- install-path verifier: packaged plugin installs into an isolated OpenClaw home without dangerous-pattern warnings
+- benchmark harness: intentionally kept out of the published tarball so benchmark-only `child_process` usage does not dilute install trust
 
 ## Why This Matters
 
@@ -43,6 +46,7 @@ A small, inspectable artifact is not cosmetic. It is part of the product promise
 6. Confirm `openclaw.plugin.json` matches the package version and config schema.
 7. Publish with an exact version, not a floating range.
 8. Document the pinned install command in release notes.
+9. Run `npm run verify:openclaw-lab` and confirm the install report stays warning-free on package contents.
 
 ## Provenance Notes
 

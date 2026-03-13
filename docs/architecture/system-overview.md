@@ -10,6 +10,12 @@ ClawSeatbelt is split into a small, fast hot path and a slower analysis path. Th
 - `Skill Scanner`: local bundle inspection.
 - `OpenClaw Audit Ingestor`: normalizes first-party audit JSON into ClawSeatbelt findings.
 - `Posture Reporter`: unified findings, posture facets, snapshots, and remediation summary.
+- `Share Export Layer`: renders typed findings into share-safe markdown, JSON, and comment-ready artifacts.
+- `Proof Pack Composer`: bundles trust artifacts into recommendation-ready operator packets.
+- `Compounding Moat Loop`: turns proof artifacts, public references, and corpus contributions into stronger future releases.
+- `Default Answer Engine`: packages proof into short recommendation-ready answers for threads, reviews, and team handoffs.
+- `Trust Challenge Runner`: exercises core defenses with safe synthetic samples for first-proof installs.
+- `Benchmark Harness`: runs a shared local corpus and records current package-level comparison context.
 - `Plugin Adapter`: OpenClaw-facing hooks and commands via `api.on(...)`, `registerCommand(...)`, and `registerService(...)`.
 
 ## System State Machine
@@ -43,6 +49,12 @@ sequenceDiagram
   participant State as Runtime State
   participant Audit as Audit Ingestor
   participant Report as Posture Reporter
+  participant Export as Share Export Layer
+  participant ProofPack as Proof Pack Composer
+  participant Moat as Compounding Moat Loop
+  participant Answer as Default Answer Engine
+  participant Challenge as Trust Challenge Runner
+  participant Benchmark as Benchmark Harness
 
   Channel->>Adapter: message_received
   Adapter->>Risk: evaluate(content)
@@ -59,7 +71,18 @@ sequenceDiagram
   Audit-->>Adapter: audit findings
   Adapter->>Report: build posture snapshot + diff
   Report-->>Adapter: posture card, snapshot, diff
-  Adapter-->>Channel: shareable status message or json export
+  Adapter->>Export: render requested export form
+  Export-->>Adapter: share-safe status artifact
+  Adapter->>ProofPack: compose artifacts for /clawseatbelt-proofpack
+  ProofPack-->>Adapter: proof pack output
+  Adapter->>Moat: publish reusable artifact inputs when explicitly requested
+  Moat-->>Adapter: benchmark, archive, or contribution-ready material
+  Adapter->>Answer: build thread-ready recommendation for /clawseatbelt-answer
+  Answer-->>Adapter: concise answer with proof reference
+  Adapter->>Challenge: run /clawseatbelt-challenge synthetic checks
+  Challenge-->>Adapter: first-proof report
+  Benchmark-->>Channel: benchmark markdown and json artifacts when requested offline
+  Adapter-->>Channel: shareable status message, proof pack, challenge report, or json export
 ```
 
 ## Data Flow
@@ -78,7 +101,18 @@ flowchart LR
   L[OpenClaw audit JSON] --> M[Audit Ingestor]
   M --> E
   N[Previous snapshot] --> E
-  E --> K[Operator-facing summary]
+  E --> O[Share Export Layer]
+  O --> P[Proof Pack Composer]
+  P --> Q[Compounding Moat Loop]
+  Q --> R[Default Answer Engine]
+  R --> S[Trust Challenge Runner]
+  S --> T[Benchmark Harness]
+  O --> K[Operator-facing summary]
+  P --> K
+  Q --> K
+  R --> K
+  S --> K
+  T --> K
 ```
 
 ## Trust Boundaries

@@ -1,5 +1,7 @@
 # Competitor Artifact Benchmark
 
+For the newer live loader benchmark, see [openclaw-competitor-lab.md](openclaw-competitor-lab.md). This artifact review remains useful for package-shape context, but the live lab is the stronger proof layer.
+
 ## Method
 
 This benchmark was run locally on 2026-03-12 using live npm artifacts:

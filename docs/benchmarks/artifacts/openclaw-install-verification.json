@@ -1,0 +1,43 @@
+{
+  "generatedAt": "2026-03-12T17:46:38.104Z",
+  "openclawVersion": "2026.3.11",
+  "packageCheck": {
+    "passed": true,
+    "filename": "clawseatbelt-0.1.0.tgz",
+    "size": 31289,
+    "unpackedSize": 127715,
+    "includesBenchmarkFiles": false
+  },
+  "installCheck": {
+    "passed": true,
+    "dangerousPatternWarning": false,
+    "allowlistPinned": true,
+    "installRecordPresent": true,
+    "notes": [
+      "Install completed without additional plugin loader warnings."
+    ]
+  },
+  "plugin": {
+    "id": "clawseatbelt",
+    "name": "ClawSeatbelt",
+    "status": "loaded",
+    "origin": "global",
+    "commands": [
+      "clawseatbelt-status",
+      "clawseatbelt-mode",
+      "clawseatbelt-scan",
+      "clawseatbelt-explain",
+      "clawseatbelt-proofpack",
+      "clawseatbelt-answer",
+      "clawseatbelt-challenge"
+    ],
+    "services": [
+      "clawseatbelt-maintenance"
+    ],
+    "hookCount": 5,
+    "configSchema": true
+  },
+  "lab": {
+    "homeRemoved": true
+  }
+}

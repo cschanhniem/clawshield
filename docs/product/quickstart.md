@@ -8,6 +8,8 @@ Once the package is published:
 
 ```bash
 openclaw plugins install clawseatbelt@0.1.0
+openclaw config set --strict-json plugins.allow '["clawseatbelt"]'
+openclaw config set --strict-json plugins.entries.clawseatbelt.enabled true
 ```
 
 ## 2. Allow It Explicitly
@@ -21,6 +23,8 @@ Pin plugin trust in your OpenClaw config:
   }
 }
 ```
+
+If you install into a blank OpenClaw home and skip the allowlist step, OpenClaw will warn that non-bundled plugins are discoverable. That is expected. Pin the allowlist immediately so the warning disappears for the right reason.
 
 ## 3. Start In Observe Mode
 
@@ -77,7 +81,36 @@ Run:
 
 Use this before enabling a skill, especially if the bundle pulls remote scripts, expands permissions, or hides execution behind setup instructions.
 
-## 6. Move To Enforce When The Signal Is Clean
+The current scanner also flags unpinned installers, `latest` or branch-based installs, `preinstall` or `postinstall` hooks, and setup steps that widen OpenClaw permissions.
+
+
+## 6. Export A Share-Safe Proof Pack
+
+Once you have posture and scan signal, render a packet you can forward without cleanup:
+
+```bash
+/clawseatbelt-proofpack --audit-file ./openclaw-audit.json --target pr-comment --audience public
+```
+
+For a one-paragraph recommendation answer:
+
+```bash
+/clawseatbelt-answer --target support --audience public
+```
+
+These surfaces are built for support threads, PRs, issues, and team handoffs. Public mode keeps secrets and local paths out of the artifact by default.
+
+## 7. Run The First-Proof Trust Challenge
+
+On a clean install, you can prove the local defenses are wired without waiting for a live incident:
+
+```bash
+/clawseatbelt-challenge --target markdown --audience public
+```
+
+This is synthetic on purpose. It verifies that the main protective layers are active, then tells the operator to follow up with real posture and benchmark work.
+
+## 8. Move To Enforce When The Signal Is Clean
 
 After a low-noise soak, switch to:
 
@@ -93,6 +126,9 @@ After a low-noise soak, switch to:
 - `clawseatbelt-mode <observe|enforce|quiet>`
 - `clawseatbelt-scan <path>`
 - `clawseatbelt-explain <finding-id>`
+- `clawseatbelt-proofpack --target <markdown|pr-comment|issue-comment|chat> --audience <public|internal|private>`
+- `clawseatbelt-answer --target <support|pr-review|issue|team> --audience <public|internal|private>`
+- `clawseatbelt-challenge --target <markdown|pr-comment|issue-comment|chat> --audience <public|internal|private>`
 - Use the slash form inside OpenClaw chat, for example `/clawseatbelt-status`.
 
 ## Best Pairings With Native OpenClaw Security

@@ -1,9 +1,13 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { isAbsolute, resolve, sep } from "node:path";
+import { renderDefaultAnswer, type DefaultAnswerTarget } from "../reporting/defaultAnswer.js";
+import { renderChallengeReport, runTrustChallenge } from "../reporting/challengeReport.js";
 import { normalizeOpenClawAuditReport } from "../reporting/openClawAudit.js";
 import { buildPostureSummary, parsePostureSnapshot } from "../reporting/postureReport.js";
+import { renderProofPack } from "../reporting/proofPack.js";
 import { scanSkillDirectory } from "../scanner/skillScanner.js";
-import type { OpenClawAuditReport, PostureSnapshot, RiskEvaluation } from "../types/domain.js";
+import { type ShareAudience, type ShareTarget } from "../reporting/shareExport.js";
+import type { OpenClawAuditReport, PostureSnapshot, PostureSummary, RiskEvaluation, SkillScanReport } from "../types/domain.js";
 import type {
   OpenClawPluginApiLike,
   PluginCommandContext,
@@ -26,6 +30,21 @@ function resolveSessionKey(parts: Array<string | undefined>): string | undefined
 
 function formatFindingsInline(evaluation: RiskEvaluation): string {
   return evaluation.findings.map((finding) => `${finding.id} (${finding.severity})`).join(", ");
+}
+
+function formatTopFindings(findings: SkillScanReport["findings"], limit = 3): string {
+  const seen = new Set<string>();
+  return findings
+    .filter((finding) => {
+      if (seen.has(finding.id)) {
+        return false;
+      }
+      seen.add(finding.id);
+      return true;
+    })
+    .slice(0, limit)
+    .map((finding) => `[${finding.severity}] ${finding.title}`)
+    .join("; ");
 }
 
 function buildGuardrailContext(
@@ -56,11 +75,43 @@ function buildReply(text: string, isError = false): ReplyPayload {
   return { text, isError };
 }
 
+function isReplyPayload(value: unknown): value is ReplyPayload {
+  return typeof value === "object" && value !== null && ("text" in value || "isError" in value);
+}
+
 interface StatusCommandOptions {
   json: boolean;
   auditFile?: string;
   diffFile?: string;
   writeSnapshot?: string;
+}
+
+interface ArtifactCommandOptions {
+  audience: ShareAudience;
+  auditFile?: string;
+  diffFile?: string;
+  scanPath?: string;
+  writeFile?: string;
+}
+
+interface ProofPackCommandOptions extends ArtifactCommandOptions {
+  target: ShareTarget;
+}
+
+interface AnswerCommandOptions extends ArtifactCommandOptions {
+  target: DefaultAnswerTarget;
+}
+
+interface ChallengeCommandOptions {
+  audience: ShareAudience;
+  target: ShareTarget;
+  writeFile?: string;
+}
+
+interface BuiltPostureContext {
+  mode: RuntimeMode;
+  recentIncidents: string[];
+  summary: PostureSummary;
 }
 
 function tokenizeArgs(raw: string | undefined): string[] {
@@ -122,6 +173,162 @@ function parseStatusArgs(raw: string | undefined): { options?: StatusCommandOpti
   return { options };
 }
 
+function parseProofPackArgs(raw: string | undefined): { options?: ProofPackCommandOptions; error?: string } {
+  const tokens = tokenizeArgs(raw);
+  const options: ProofPackCommandOptions = {
+    audience: "public",
+    target: "markdown"
+  };
+
+  for (let index = 0; index < tokens.length; index += 1) {
+    const token = tokens[index];
+    const value = tokens[index + 1];
+
+    if (
+      token === "--audit-file" ||
+      token === "--diff-file" ||
+      token === "--scan-path" ||
+      token === "--write-file" ||
+      token === "--audience" ||
+      token === "--target"
+    ) {
+      if (!value) {
+        return { error: `${token} requires a value.` };
+      }
+
+      if (token === "--audit-file") {
+        options.auditFile = value;
+      } else if (token === "--diff-file") {
+        options.diffFile = value;
+      } else if (token === "--scan-path") {
+        options.scanPath = value;
+      } else if (token === "--write-file") {
+        options.writeFile = value;
+      } else if (token === "--audience") {
+        if (value !== "public" && value !== "internal" && value !== "private") {
+          return { error: "Audience must be public, internal, or private." };
+        }
+        options.audience = value;
+      } else {
+        if (value !== "markdown" && value !== "pr-comment" && value !== "issue-comment" && value !== "chat") {
+          return { error: "Target must be markdown, pr-comment, issue-comment, or chat." };
+        }
+        options.target = value;
+      }
+
+      index += 1;
+      continue;
+    }
+
+    return {
+      error:
+        `Unknown proof-pack option: ${token}. ` +
+        "Use --audit-file, --diff-file, --scan-path, --audience, --target, or --write-file."
+    };
+  }
+
+  return { options };
+}
+
+function parseAnswerArgs(raw: string | undefined): { options?: AnswerCommandOptions; error?: string } {
+  const tokens = tokenizeArgs(raw);
+  const options: AnswerCommandOptions = {
+    audience: "public",
+    target: "support"
+  };
+
+  for (let index = 0; index < tokens.length; index += 1) {
+    const token = tokens[index];
+    const value = tokens[index + 1];
+
+    if (
+      token === "--audit-file" ||
+      token === "--diff-file" ||
+      token === "--scan-path" ||
+      token === "--write-file" ||
+      token === "--audience" ||
+      token === "--target"
+    ) {
+      if (!value) {
+        return { error: `${token} requires a value.` };
+      }
+
+      if (token === "--audit-file") {
+        options.auditFile = value;
+      } else if (token === "--diff-file") {
+        options.diffFile = value;
+      } else if (token === "--scan-path") {
+        options.scanPath = value;
+      } else if (token === "--write-file") {
+        options.writeFile = value;
+      } else if (token === "--audience") {
+        if (value !== "public" && value !== "internal" && value !== "private") {
+          return { error: "Audience must be public, internal, or private." };
+        }
+        options.audience = value;
+      } else {
+        if (value !== "support" && value !== "pr-review" && value !== "issue" && value !== "team") {
+          return { error: "Target must be support, pr-review, issue, or team." };
+        }
+        options.target = value;
+      }
+
+      index += 1;
+      continue;
+    }
+
+    return {
+      error:
+        `Unknown answer option: ${token}. ` +
+        "Use --audit-file, --diff-file, --scan-path, --audience, --target, or --write-file."
+    };
+  }
+
+  return { options };
+}
+
+function parseChallengeArgs(raw: string | undefined): { options?: ChallengeCommandOptions; error?: string } {
+  const tokens = tokenizeArgs(raw);
+  const options: ChallengeCommandOptions = {
+    audience: "public",
+    target: "markdown"
+  };
+
+  for (let index = 0; index < tokens.length; index += 1) {
+    const token = tokens[index];
+    const value = tokens[index + 1];
+
+    if (token === "--audience" || token === "--target" || token === "--write-file") {
+      if (!value) {
+        return { error: `${token} requires a value.` };
+      }
+
+      if (token === "--write-file") {
+        options.writeFile = value;
+      } else if (token === "--audience") {
+        if (value !== "public" && value !== "internal" && value !== "private") {
+          return { error: "Audience must be public, internal, or private." };
+        }
+        options.audience = value;
+      } else {
+        if (value !== "markdown" && value !== "pr-comment" && value !== "issue-comment" && value !== "chat") {
+          return { error: "Target must be markdown, pr-comment, issue-comment, or chat." };
+        }
+        options.target = value;
+      }
+
+      index += 1;
+      continue;
+    }
+
+    return {
+      error: `Unknown challenge option: ${token}. Use --audience, --target, or --write-file.`
+    };
+  }
+
+  return { options };
+}
+
 export class ClawSeatbeltRuntime {
   readonly state: ClawSeatbeltRuntimeState;
 
@@ -174,6 +381,30 @@ export class ClawSeatbeltRuntime {
       handler: (ctx) => this.handleExplain(ctx)
     });
 
+    this.api.registerCommand({
+      name: "clawseatbelt-proofpack",
+      description: "Render a share-safe proof pack for PRs, issues, or chat",
+      requireAuth: true,
+      acceptsArgs: true,
+      handler: (ctx) => this.handleProofPack(ctx)
+    });
+
+    this.api.registerCommand({
+      name: "clawseatbelt-answer",
+      description: "Render a concise recommendation-ready answer with local proof",
+      requireAuth: true,
+      acceptsArgs: true,
+      handler: (ctx) => this.handleAnswer(ctx)
+    });
+
+    this.api.registerCommand({
+      name: "clawseatbelt-challenge",
+      description: "Run a built-in trust challenge with synthetic local samples",
+      requireAuth: true,
+      acceptsArgs: true,
+      handler: (ctx) => this.handleChallenge(ctx)
+    });
+
     this.api.on("message_received", (event, ctx) => {
       const evaluation = this.state.evaluateCached(event.content, () => evaluateInboundMessage(event.content));
       const sessionKey = resolveSessionKey([ctx.channelId, ctx.accountId, ctx.conversationId, event.from]);
@@ -194,46 +425,12 @@ export class ClawSeatbeltRuntime {
       return buildReply(parsed.error ?? "Invalid status options.", true);
     }
 
-    const configurationFindings = assessOpenClawConfiguration(this.api.config);
-    const recentIncidents = this.state.getRecentIncidents(this.config.maxDigestFindings);
-    const mode = this.state.getEffectiveMode();
-    const incidentLines = recentIncidents
-      .map((incident) => `${incident.title} [${incident.severity}]`)
-      .slice(0, this.config.maxDigestFindings);
-
-    let openClawAudit: OpenClawAuditReport | undefined;
-    if (parsed.options.auditFile) {
-      try {
-        openClawAudit = this.loadAuditReport(parsed.options.auditFile);
-      } catch (error) {
-        const message = error instanceof Error ? error.message : "unknown audit parse failure";
-        return buildReply(`Failed to load OpenClaw audit file: ${message}`, true);
-      }
+    const posture = this.buildPostureContext(parsed.options);
+    if (isReplyPayload(posture)) {
+      return posture;
     }
 
-    let previousSnapshot: PostureSnapshot | undefined;
-    if (parsed.options.diffFile) {
-      try {
-        previousSnapshot = this.loadPostureSnapshot(parsed.options.diffFile);
-      } catch (error) {
-        const message = error instanceof Error ? error.message : "unknown diff parse failure";
-        return buildReply(`Failed to load posture snapshot: ${message}`, true);
-      }
-    }
-
-    const summary = buildPostureSummary(
-      {
-        configurationFindings,
-        openClawAudit
-      },
-      {
-        previousSnapshot,
-        mode,
-        recentIncidents: incidentLines
-      }
-    );
-
-    const { card, diff, ...snapshot } = summary;
+    const { card, diff, ...snapshot } = posture.summary;
 
     let snapshotPath: string | undefined;
     if (parsed.options.writeSnapshot) {
@@ -250,10 +447,10 @@ export class ClawSeatbeltRuntime {
       return buildReply(
         JSON.stringify(
           {
-            mode,
+            mode: posture.mode,
             posture: snapshot,
             diff,
-            recentIncidents
+            recentIncidents: posture.recentIncidents
           },
           null,
           2
@@ -286,12 +483,18 @@ export class ClawSeatbeltRuntime {
     try {
       const target = this.safeResolvePath(raw);
       const report = scanSkillDirectory(target);
-      const headline =
-        report.findings.length > 0
-          ? `${report.findings.length} finding(s), score ${report.score}/100 (${report.severity})`
-          : "No suspicious patterns detected.";
+      if (report.findings.length === 0) {
+        return buildReply(`Scanned ${target}. No suspicious patterns detected.`);
+      }
 
-      return buildReply(`Scanned ${target}. ${headline}`);
+      const topFindings = formatTopFindings(report.findings);
+      const firstAction = report.findings[0]?.remediation.action ?? report.findings[0]?.remediation.summary;
+
+      return buildReply(
+        `Scanned ${target}. ${report.findings.length} finding(s), score ${report.score}/100 (${report.severity}). ` +
+          `Top findings: ${topFindings}. ` +
+          `First action: ${firstAction}`
+      );
     } catch (error) {
       const message = error instanceof Error ? error.message : "unknown scan failure";
       this.api.logger.warn(`clawseatbelt-scan failed: ${message}`);
@@ -322,6 +525,72 @@ export class ClawSeatbeltRuntime {
     }
 
     return buildReply(`No recent finding found for ${findingId}.`, true);
+  }
+
+  private handleProofPack(ctx: PluginCommandContext): ReplyPayload {
+    const parsed = parseProofPackArgs(ctx.args);
+    if (parsed.error || !parsed.options) {
+      return buildReply(parsed.error ?? "Invalid proof-pack options.", true);
+    }
+
+    const posture = this.buildPostureContext(parsed.options);
+    if (isReplyPayload(posture)) {
+      return posture;
+    }
+
+    const skillScan = this.tryLoadSkillScanReport(parsed.options.scanPath);
+    if (isReplyPayload(skillScan)) {
+      return skillScan;
+    }
+
+    const proofPack = renderProofPack(posture.summary, {
+      audience: parsed.options.audience,
+      target: parsed.options.target,
+      mode: posture.mode,
+      skillScan
+    });
+
+    return this.writeArtifactReply(proofPack, parsed.options.writeFile, "proof pack");
+  }
+
+  private handleAnswer(ctx: PluginCommandContext): ReplyPayload {
+    const parsed = parseAnswerArgs(ctx.args);
+    if (parsed.error || !parsed.options) {
+      return buildReply(parsed.error ?? "Invalid answer options.", true);
+    }
+
+    const posture = this.buildPostureContext(parsed.options);
+    if (isReplyPayload(posture)) {
+      return posture;
+    }
+
+    const skillScan = this.tryLoadSkillScanReport(parsed.options.scanPath);
+    if (isReplyPayload(skillScan)) {
+      return skillScan;
+    }
+
+    const answer = renderDefaultAnswer(posture.summary, {
+      audience: parsed.options.audience,
+      target: parsed.options.target,
+      mode: posture.mode,
+      skillScan
+    });
+
+    return this.writeArtifactReply(answer, parsed.options.writeFile, "answer");
+  }
+
+  private handleChallenge(ctx: PluginCommandContext): ReplyPayload {
+    const parsed = parseChallengeArgs(ctx.args);
+    if (parsed.error || !parsed.options) {
+      return buildReply(parsed.error ?? "Invalid challenge options.", true);
+    }
+
+    const report = renderChallengeReport(runTrustChallenge(), {
+      audience: parsed.options.audience,
+      target: parsed.options.target
+    });
+
+    return this.writeArtifactReply(report, parsed.options.writeFile, "challenge report");
   }
 
   private beforePromptBuild(prompt: string, sessionKey: string | undefined): PluginHookBeforePromptBuildResult | void {
@@ -429,5 +698,80 @@ export class ClawSeatbeltRuntime {
     const target = this.safeResolvePath(input);
     const parsed = JSON.parse(readFileSync(target, "utf8")) as unknown;
     return parsePostureSnapshot(parsed);
+  }
+
+  private buildPostureContext(options: { auditFile?: string; diffFile?: string }): BuiltPostureContext | ReplyPayload {
+    const configurationFindings = assessOpenClawConfiguration(this.api.config);
+    const recentIncidents = this.state
+      .getRecentIncidents(this.config.maxDigestFindings)
+      .map((incident) => `${incident.title} [${incident.severity}]`)
+      .slice(0, this.config.maxDigestFindings);
+    const mode = this.state.getEffectiveMode();
+
+    let openClawAudit: OpenClawAuditReport | undefined;
+    if (options.auditFile) {
+      try {
+        openClawAudit = this.loadAuditReport(options.auditFile);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "unknown audit parse failure";
+        return buildReply(`Failed to load OpenClaw audit file: ${message}`, true);
+      }
+    }
+
+    let previousSnapshot: PostureSnapshot | undefined;
+    if (options.diffFile) {
+      try {
+        previousSnapshot = this.loadPostureSnapshot(options.diffFile);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "unknown diff parse failure";
+        return buildReply(`Failed to load posture snapshot: ${message}`, true);
+      }
+    }
+
+    return {
+      mode,
+      recentIncidents,
+      summary: buildPostureSummary(
+        {
+          configurationFindings,
+          openClawAudit
+        },
+        {
+          previousSnapshot,
+          mode,
+          recentIncidents
+        }
+      )
+    };
+  }
+
+  private tryLoadSkillScanReport(scanPath: string | undefined): SkillScanReport | ReplyPayload | undefined {
+    if (!scanPath) {
+      return undefined;
+    }
+
+    try {
+      const target = this.safeResolvePath(scanPath);
+      return scanSkillDirectory(target);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "unknown scan failure";
+      this.api.logger.warn(`proof surface skill scan failed: ${message}`);
+      return buildReply(`Failed to load skill scan input: ${message}`, true);
+    }
+  }
+
+  private writeArtifactReply(content: string, writeTarget: string | undefined, label: string): ReplyPayload {
+    if (!writeTarget) {
+      return buildReply(content);
+    }
+
+    try {
+      const target = this.safeResolvePath(writeTarget);
+      writeFileSync(target, `${content}\n`, "utf8");
+      return buildReply(`${content}\n\nSaved ${label} to ${target}.`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "unknown write failure";
+      return buildReply(`Failed to write ${label}: ${message}`, true);
+    }
   }
 }

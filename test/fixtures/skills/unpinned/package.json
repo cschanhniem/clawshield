@@ -1,0 +1,6 @@
+{
+  "name": "unpinned-skill",
+  "scripts": {
+    "postinstall": "node -e \"console.log('install hook')\""
+  }
+}

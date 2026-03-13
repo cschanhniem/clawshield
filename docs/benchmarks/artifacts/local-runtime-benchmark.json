@@ -1,0 +1,143 @@
+{
+  "generatedAt": "2026-03-12T17:32:54.024Z",
+  "workspaceRoot": "/Volumes/SSD/clawshield",
+  "summary": {
+    "messagePasses": 3,
+    "messageTotal": 3,
+    "redactionPasses": 2,
+    "redactionTotal": 2,
+    "skillPasses": 3,
+    "skillTotal": 3
+  },
+  "messages": [
+    {
+      "name": "safe-question",
+      "passed": true,
+      "score": 0,
+      "recommendedMode": "allow",
+      "matchedFindingIds": []
+    },
+    {
+      "name": "prompt-injection-shell",
+      "passed": true,
+      "score": 64,
+      "recommendedMode": "hold",
+      "matchedFindingIds": [
+        "msg-prompt-ignore",
+        "msg-shell-bait",
+        "msg-suspicious-url"
+      ]
+    },
+    {
+      "name": "credential-harvest",
+      "passed": true,
+      "score": 34,
+      "recommendedMode": "warn",
+      "matchedFindingIds": [
+        "msg-credential-harvest"
+      ]
+    }
+  ],
+  "redactions": [
+    {
+      "name": "bearer-and-openai-key",
+      "passed": true,
+      "findingCount": 2,
+      "sanitized": "Authorization: Bearer [REDACTED_TOKEN] OpenAI [REDACTED_API_KEY]"
+    },
+    {
+      "name": "aws-style-secret",
+      "passed": true,
+      "findingCount": 1,
+      "sanitized": "aws_secret_access_key = [REDACTED_SECRET]"
+    }
+  ],
+  "skills": [
+    {
+      "name": "benign",
+      "passed": true,
+      "score": 0,
+      "severity": "low",
+      "findingIds": []
+    },
+    {
+      "name": "malicious",
+      "passed": true,
+      "score": 86,
+      "severity": "high",
+      "findingIds": [
+        "skill-pipe-shell",
+        "skill-credential-request",
+        "skill-hidden-exec"
+      ]
+    },
+    {
+      "name": "unpinned-and-hooks",
+      "passed": true,
+      "score": 100,
+      "severity": "critical",
+      "findingIds": [
+        "skill-hidden-exec",
+        "skill-unpinned-install",
+        "skill-moving-ref",
+        "skill-permission-expansion",
+        "skill-remote-fetch",
+        "skill-install-hook"
+      ]
+    }
+  ],
+  "challenge": {
+    "headline": "ClawSeatbelt trust challenge passed",
+    "summary": "This quick self-check uses built-in synthetic samples to prove that message scoring, transcript hygiene, and skill inspection are active locally.",
+    "checks": [
+      {
+        "id": "message-ingress",
+        "label": "Inbound Risk Scoring",
+        "verdict": "Triggered 4 finding(s) at 98/100 (critical).",
+        "evidence": "Message attempts instruction override"
+      },
+      {
+        "id": "transcript-hygiene",
+        "label": "Transcript Hygiene",
+        "verdict": "Redacted 2 secret-like artifact(s).",
+        "evidence": "Authorization: Bearer [REDACTED_TOKEN] [REDACTED_API_KEY]"
+      },
+      {
+        "id": "skill-supply-chain",
+        "label": "Skill Supply Chain",
+        "verdict": "Flagged 3 risky install pattern(s).",
+        "evidence": "Skill bundle contains pipe-to-shell installer guidance"
+      }
+    ]
+  },
+  "competitors": [
+    {
+      "packageName": "@openguardrails/moltguard",
+      "available": true,
+      "version": "6.8.21",
+      "description": "AI agent security plugin for OpenClaw: prompt injection detection, PII sanitization, and monitoring dashboard",
+      "homepage": "https://github.com/openguardrails/openguardrails/tree/main/moltguard#readme"
+    },
+    {
+      "packageName": "@adversa/secureclaw",
+      "available": true,
+      "version": "2.2.0",
+      "description": "Automated security hardening plugin for OpenClaw",
+      "homepage": "https://github.com/adversa-ai/secureclaw#readme"
+    },
+    {
+      "packageName": "@policyshield/openclaw-plugin",
+      "available": true,
+      "version": "0.14.0",
+      "description": "PolicyShield plugin for OpenClaw — runtime tool call policy enforcement",
+      "homepage": "https://github.com/mishabar410/PolicyShield/tree/main/plugins/openclaw#readme"
+    },
+    {
+      "packageName": "@f4bioo/berry-shield",
+      "available": true,
+      "version": "2026.3.3-2",
+      "description": "OpenClaw plugin for policy checks, command/file blocking, and sensitive-data redaction.",
+      "homepage": "https://github.com/F4bioo/berry-shield#readme"
+    }
+  ]
+}

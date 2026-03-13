@@ -22,6 +22,7 @@ If you are searching for an OpenClaw security plugin, OpenClaw prompt injection 
 - transcript redaction for persisted tool results
 - outbound secret scrubbing
 - OpenClaw skill scanning for suspicious install and execution patterns
+- Detection of unpinned installs, moving refs, install hooks, remote fetches, and permission-widening setup steps inside skill bundles
 - unified posture reporting with remediation guidance
 - OpenClaw security audit JSON ingestion, snapshot export, and posture diffing
 
@@ -31,6 +32,8 @@ After publication:
 
 ```bash
 openclaw plugins install clawseatbelt@0.1.0
+openclaw config set --strict-json plugins.allow '["clawseatbelt"]'
+openclaw config set --strict-json plugins.entries.clawseatbelt.enabled true
 ```
 
 Pin trust explicitly in your OpenClaw config:
@@ -64,13 +67,27 @@ Suggested first configuration:
 
 Start in `observe`, review the signal for a few days, then move to `enforce` when the findings are clean and predictable.
 
+The published tarball is intentionally tighter than the local development tree and excludes the benchmark harness from the install artifact, so OpenClaw does not flag benchmark-only `child_process` code during plugin install.
+
 ## Core Commands
 
 - `/clawseatbelt-status`
 - `/clawseatbelt-status --json --audit-file ./audit.json --write-snapshot ./clawseatbelt-posture.json`
+- `/clawseatbelt-proofpack --audit-file ./audit.json --target pr-comment --audience public`
+- `/clawseatbelt-answer --target support --audience public`
+- `/clawseatbelt-challenge --target markdown --audience public`
 - `/clawseatbelt-mode <observe|enforce|quiet>`
 - `/clawseatbelt-scan <path>`
 - `/clawseatbelt-explain <finding-id>`
+
+## Built-In Proof Surfaces
+
+- `clawseatbelt-status` remains the fastest posture card and JSON snapshot path.
+- `clawseatbelt-proofpack` turns local posture, scan findings, and diffs into a share-safe packet for PRs, issues, and chat.
+- `clawseatbelt-answer` renders a short recommendation-ready answer backed by the current local proof instead of generic copy.
+- `clawseatbelt-challenge` gives a safe first-proof self-check on a clean install by exercising message scoring, transcript hygiene, and skill inspection with synthetic samples.
+
+Public proof surfaces default to redaction-friendly output and pinned install footers so the recommendation path stays tasteful and reproducible.
 
 ## Why It Converts Better Than Generic Guardrails
 
@@ -108,6 +125,7 @@ Manual release flow:
 
 ```bash
 npm test
+npm run verify:openclaw-lab
 npm pack --json --pack-destination .tmp/pack
 npm publish
 ```
@@ -119,6 +137,9 @@ Automated publish is prepared through GitHub Actions once `NPM_TOKEN` is configu
 ```bash
 npm install
 npm test
+npm run benchmark:local
+npm run benchmark:competitors:docs
+npm run verify:openclaw-lab
 ```
 
 ## Docs
@@ -126,8 +147,15 @@ npm test
 - [plan.md](plan.md)
 - [AGENTS.md](AGENTS.md)
 - [docs/product/quickstart.md](docs/product/quickstart.md)
+- [docs/product/why-clawseatbelt-first.md](docs/product/why-clawseatbelt-first.md)
+- [docs/product/maintainer-answer-kit.md](docs/product/maintainer-answer-kit.md)
 - [docs/product/positioning.md](docs/product/positioning.md)
 - [docs/product/packaging-and-provenance.md](docs/product/packaging-and-provenance.md)
 - [docs/benchmarks/competitor-artifact-benchmark.md](docs/benchmarks/competitor-artifact-benchmark.md)
+- [docs/benchmarks/local-runtime-benchmark.md](docs/benchmarks/local-runtime-benchmark.md)
+- [docs/benchmarks/openclaw-competitor-lab.md](docs/benchmarks/openclaw-competitor-lab.md)
+- [docs/benchmarks/openclaw-install-verification.md](docs/benchmarks/openclaw-install-verification.md)
 - [docs/architecture/system-overview.md](docs/architecture/system-overview.md)
+- [docs/architecture/competitor-lab.md](docs/architecture/competitor-lab.md)
+- [docs/architecture/openclaw-lab-verifier.md](docs/architecture/openclaw-lab-verifier.md)
 - [docs/release/publish-playbook.md](docs/release/publish-playbook.md)

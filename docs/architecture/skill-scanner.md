@@ -43,7 +43,9 @@ flowchart TD
 ## Initial Detection Targets
 
 - `curl | bash` or equivalent pipe-to-shell flows
-- base64 decode plus execution hints
+- unpinned installs and moving refs such as `latest`, `main`, or bare package names
+- install hooks such as `preinstall`, `postinstall`, and `prepare`
+- base64 decode plus hidden execution hints such as `node -e`, `python -c`, `bash -c`, or encoded PowerShell
 - requests for tokens, wallets, or credentials
-- shell installers with broad permissions
-- suspicious external fetch patterns
+- OpenClaw permission expansion such as `exec.security = full`, `tools.profile = full`, or wildcard ingress
+- suspicious external fetch patterns including raw content URLs and IP-address downloads
