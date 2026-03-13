@@ -12,6 +12,20 @@ openclaw config set --strict-json plugins.allow '["clawseatbelt"]'
 openclaw config set --strict-json plugins.entries.clawseatbelt.enabled true
 ```
 
+For local-first development before npm publication:
+
+```bash
+npm run deploy:local
+```
+
+For a release-like local install from the packed tarball:
+
+```bash
+npm run deploy:local:pack
+```
+
+`deploy:local` links the repository root into OpenClaw after building. `deploy:local:pack` installs the generated `.tgz` so you can test the same artifact shape OpenClaw will consume from npm.
+
 ## 2. Allow It Explicitly
 
 Pin plugin trust in your OpenClaw config:
@@ -130,6 +144,7 @@ After a low-noise soak, switch to:
 - `clawseatbelt-answer --target <support|pr-review|issue|team> --audience <public|internal|private>`
 - `clawseatbelt-challenge --target <markdown|pr-comment|issue-comment|chat> --audience <public|internal|private>`
 - Use the slash form inside OpenClaw chat, for example `/clawseatbelt-status`.
+- For local deployment, use `npm run deploy:local` or `npm run deploy:local:pack` from the repository root.
 
 ## Best Pairings With Native OpenClaw Security
 

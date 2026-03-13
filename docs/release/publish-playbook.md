@@ -17,11 +17,25 @@ Why this is the default path:
 
 ## Manual Publish
 
+For local OpenClaw deployment, do not publish at all. Use:
+
+```bash
+npm run deploy:local
+```
+
+or:
+
+```bash
+npm run deploy:local:pack
+```
+
+If you truly need a local terminal publish to npm instead of GitHub trusted publishing:
+
 ```bash
 npm install
 npm test
 npm pack --json --pack-destination .tmp/pack
-npm publish
+npm publish --provenance=false
 ```
 
 ## Recommended Post-Publish Checks

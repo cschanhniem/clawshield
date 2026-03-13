@@ -30,10 +30,11 @@ ClawSeatbelt is a local-first trust layer for OpenClaw. The core shape is:
 9. If the work affects corpus benchmarking or comparison evidence, read [docs/architecture/benchmark-harness.md](docs/architecture/benchmark-harness.md).
 10. If the work affects package trust, disposable install checks, or allowlist pinning, read [docs/architecture/openclaw-lab-verifier.md](docs/architecture/openclaw-lab-verifier.md).
 11. If the work affects live competitor installs or category-proof claims, read [docs/architecture/competitor-lab.md](docs/architecture/competitor-lab.md).
-12. Check which rubric in `plan.md` the work is meant to improve and which competitor it is meant to beat.
-13. Make the smallest coherent set of changes that improves the product materially.
-14. Update docs, diagrams, and task log in the same turn.
-15. Run verification for the surfaces you touched.
+12. If the work affects local OpenClaw install loops or tarball rehearsal, read [docs/architecture/local-deploy.md](docs/architecture/local-deploy.md).
+13. Check which rubric in `plan.md` the work is meant to improve and which competitor it is meant to beat.
+14. Make the smallest coherent set of changes that improves the product materially.
+15. Update docs, diagrams, and task log in the same turn.
+16. Run verification for the surfaces you touched.
 
 ## Decision Filter
 

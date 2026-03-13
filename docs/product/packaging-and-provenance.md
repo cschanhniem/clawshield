@@ -52,6 +52,7 @@ A small, inspectable artifact is not cosmetic. It is part of the product promise
 
 - Prefer reproducible builds from tagged commits.
 - Prefer npm trusted publishing for GitHub Actions releases. npm automatically generates provenance for public packages from public repositories when trusted publishing is configured.
+- For local OpenClaw use, deploy the plugin directly with `npm run deploy:local` or `npm run deploy:local:pack` instead of trying to publish from a shell session.
 - Keep the workflow filename stable. npm trusted publisher matching is exact and case-sensitive.
 - If trusted publishing is temporarily unavailable for first release setup, use a one-time automation token rather than a standard token that still prompts for OTP.
 - Keep dependency count visible in release notes and README copy.

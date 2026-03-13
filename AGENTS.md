@@ -31,6 +31,7 @@ Start here, in order:
 15. [docs/product/quickstart.md](docs/product/quickstart.md)
 16. [docs/benchmarks/competitor-artifact-benchmark.md](docs/benchmarks/competitor-artifact-benchmark.md)
 17. Latest task log in [tasks](tasks)
+18. [docs/architecture/local-deploy.md](docs/architecture/local-deploy.md)
 
 ## Non-Negotiables
 
@@ -71,6 +72,7 @@ Start here, in order:
 - If a change affects corpus benchmarking or package-comparison evidence, update [docs/architecture/benchmark-harness.md](docs/architecture/benchmark-harness.md).
 - If a change affects tarball trust, disposable install verification, or allowlist pinning flows, update [docs/architecture/openclaw-lab-verifier.md](docs/architecture/openclaw-lab-verifier.md).
 - If a change affects live competitor comparisons or category-proof evidence, update [docs/architecture/competitor-lab.md](docs/architecture/competitor-lab.md).
+- If a change affects local OpenClaw install loops, repo linking, or tarball rehearsal flows, update [docs/architecture/local-deploy.md](docs/architecture/local-deploy.md).
 - When you add a subsystem, add or update:
   - a state machine diagram
   - a sequence diagram if requests cross component boundaries

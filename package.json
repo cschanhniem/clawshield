@@ -53,6 +53,8 @@
     "benchmark:local": "npm run build && node dist/benchmark/runLocalBenchmark.js",
     "benchmark:competitors": "node scripts/run-competitor-lab.mjs",
     "benchmark:competitors:docs": "node scripts/run-competitor-lab.mjs --write-docs",
+    "deploy:local": "node scripts/deploy-local-openclaw.mjs",
+    "deploy:local:pack": "node scripts/deploy-local-openclaw.mjs --pack",
     "prepack": "npm run build",
     "prepublishOnly": "npm test && npm run verify:openclaw-lab",
     "release:check": "npm test && npm run verify:openclaw-lab && npm pack --json --pack-destination .tmp/pack",

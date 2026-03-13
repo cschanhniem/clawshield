@@ -69,6 +69,26 @@ Start in `observe`, review the signal for a few days, then move to `enforce` whe
 
 The published tarball is intentionally tighter than the local development tree and excludes the benchmark harness from the install artifact, so OpenClaw does not flag benchmark-only `child_process` code during plugin install.
 
+## Local-First Deploy
+
+For development before npm publication, do not `npm publish` from your shell. Provenance is enabled for release builds, and local shell publish will fail with `provider: null` because there is no GitHub OIDC provider in that environment.
+
+Use one of these instead:
+
+```bash
+npm run deploy:local
+```
+
+That path builds the repo, links it into OpenClaw, merges `plugins.allow`, and enables the plugin entry.
+
+If you want to test the exact artifact shape OpenClaw will consume from npm:
+
+```bash
+npm run deploy:local:pack
+```
+
+That path packs the tarball and installs the `.tgz` into OpenClaw locally.
+
 ## Core Commands
 
 - `/clawseatbelt-status`
@@ -127,10 +147,10 @@ Manual release flow:
 npm test
 npm run verify:openclaw-lab
 npm pack --json --pack-destination .tmp/pack
-npm publish
+npm publish --provenance=false
 ```
 
-Automated publish is prepared through GitHub Actions once `NPM_TOKEN` is configured.
+Trusted publishing through GitHub Actions is the preferred registry release path.
 
 ## Development
 
@@ -158,4 +178,5 @@ npm run verify:openclaw-lab
 - [docs/architecture/system-overview.md](docs/architecture/system-overview.md)
 - [docs/architecture/competitor-lab.md](docs/architecture/competitor-lab.md)
 - [docs/architecture/openclaw-lab-verifier.md](docs/architecture/openclaw-lab-verifier.md)
+- [docs/architecture/local-deploy.md](docs/architecture/local-deploy.md)
 - [docs/release/publish-playbook.md](docs/release/publish-playbook.md)
