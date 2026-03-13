@@ -146,7 +146,7 @@ Manual release flow:
 ```bash
 npm test
 npm run verify:openclaw-lab
-npm pack --json --pack-destination .tmp/pack
+npm run pack:artifact
 npm publish --provenance=false
 ```
 

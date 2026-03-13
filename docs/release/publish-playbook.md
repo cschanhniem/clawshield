@@ -34,7 +34,7 @@ If you truly need a local terminal publish to npm instead of GitHub trusted publ
 ```bash
 npm install
 npm test
-npm pack --json --pack-destination .tmp/pack
+npm run pack:artifact
 npm publish --provenance=false
 ```
 
@@ -109,7 +109,7 @@ Use a workspace-local cache instead of touching your global npm cache:
 
 ```bash
 mkdir -p .tmp/npm-cache
-NPM_CONFIG_CACHE=.tmp/npm-cache npm pack --json --pack-destination .tmp/pack
+NPM_CONFIG_CACHE=.tmp/npm-cache npm run pack:artifact
 ```
 
 ### OpenClaw install fails after publish

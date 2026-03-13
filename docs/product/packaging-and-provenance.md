@@ -18,7 +18,7 @@ Artifact verification was run locally on 2026-03-13 using:
 
 - `npm test`
 - `npm run verify:openclaw-lab`
-- `npm pack --json --pack-destination .tmp/pack`
+- `npm run pack:artifact`
 - `tar -tf .tmp/pack/clawseatbelt-0.1.1.tgz`
 
 Verified package facts:
@@ -39,7 +39,7 @@ A small, inspectable artifact is not cosmetic. It is part of the product promise
 ## Release Checklist
 
 1. Run `npm test`.
-2. Run `npm pack --json --pack-destination .tmp/pack`.
+2. Run `npm run pack:artifact`.
 3. Confirm `package.json` contains `openclaw.extensions`.
 4. Confirm the tarball includes `dist/openclaw.js`.
 5. Confirm the tarball does not include fixtures, scratch output, or accidental build noise.

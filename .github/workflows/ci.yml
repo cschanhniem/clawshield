@@ -27,4 +27,4 @@ jobs:
         run: npm test
 
       - name: Verify package artifact
-        run: npm pack --json --pack-destination .tmp/pack
+        run: npm run pack:artifact
