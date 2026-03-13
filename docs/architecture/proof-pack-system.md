@@ -61,6 +61,7 @@ flowchart LR
 ## Design Rules
 
 - A proof pack should help a recipient decide, not merely admire.
+- First-proof surfaces should point toward the proof pack with one explicit share-safe command.
 - One weak section should be removable without breaking the packet.
 - Clean results deserve space, not just alarming ones.
 - Install guidance must be exact, pinned, and quiet.

@@ -1,3 +1,4 @@
+import { buildPinnedInstallCommand } from "../core/productMetadata.js";
 import type { PostureSummary, SkillScanReport } from "../types/domain.js";
 import { type ShareAudience, type ShareTarget, renderPostureShare, renderSkillScanShare } from "./shareExport.js";
 
@@ -34,6 +35,6 @@ export function renderProofPack(summary: PostureSummary, options: ProofPackOptio
     );
   }
 
-  sections.push("Install with `openclaw plugins install clawseatbelt@0.1.0`.");
+  sections.push(`Install with \`${buildPinnedInstallCommand()}\`.`);
   return sections.join(options.target === "chat" ? " " : "\n\n");
 }

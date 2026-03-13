@@ -4,6 +4,7 @@ export type RuntimeMode = "observe" | "enforce" | "quiet";
 
 export interface ClawSeatbeltConfig {
   mode: RuntimeMode;
+  activationBriefEnabled: boolean;
   warnThreshold: number;
   holdThreshold: number;
   throttleWindowMs: number;
@@ -15,6 +16,7 @@ export interface ClawSeatbeltConfig {
 
 export const defaultClawSeatbeltConfig: ClawSeatbeltConfig = {
   mode: "observe",
+  activationBriefEnabled: true,
   warnThreshold: 30,
   holdThreshold: 60,
   throttleWindowMs: 5 * 60 * 1000,
@@ -39,6 +41,22 @@ function readNumber(
   }
   if (typeof value !== "number" || Number.isNaN(value)) {
     errors.push(`${String(key)} must be a number`);
+    return undefined;
+  }
+  return value;
+}
+
+function readBoolean(
+  source: Record<string, unknown>,
+  key: keyof ClawSeatbeltConfig,
+  errors: string[]
+): boolean | undefined {
+  const value = source[key];
+  if (value === undefined) {
+    return undefined;
+  }
+  if (typeof value !== "boolean") {
+    errors.push(`${String(key)} must be a boolean`);
     return undefined;
   }
   return value;
@@ -73,6 +91,7 @@ export function validateClawSeatbeltConfig(value: unknown): { ok: true; value: C
     }
   }
 
+  const activationBriefEnabled = readBoolean(value, "activationBriefEnabled", errors);
   const warnThreshold = readNumber(value, "warnThreshold", errors);
   const holdThreshold = readNumber(value, "holdThreshold", errors);
   const throttleWindowMs = readNumber(value, "throttleWindowMs", errors);
@@ -80,6 +99,9 @@ export function validateClawSeatbeltConfig(value: unknown): { ok: true; value: C
   const incidentTtlMs = readNumber(value, "incidentTtlMs", errors);
   const maxDigestFindings = readNumber(value, "maxDigestFindings", errors);
 
+  if (activationBriefEnabled !== undefined) {
+    next.activationBriefEnabled = activationBriefEnabled;
+  }
   if (warnThreshold !== undefined) {
     next.warnThreshold = warnThreshold;
   }
@@ -145,6 +167,11 @@ export const clawSeatbeltConfigSchema: OpenClawPluginConfigSchema = {
       label: "Runtime Mode",
       help: "observe adds guidance, enforce blocks risky tool calls, quiet minimizes prompt friction"
     },
+    activationBriefEnabled: {
+      label: "Activation Brief",
+      help: "Show one short first-session trust brief in the next assistant reply after install or restart",
+      advanced: true
+    },
     warnThreshold: {
       label: "Warn Threshold",
       help: "Score that starts operator-visible caution behavior",
@@ -171,6 +198,7 @@ export const clawSeatbeltConfigSchema: OpenClawPluginConfigSchema = {
     additionalProperties: false,
     properties: {
       mode: { type: "string", enum: ["observe", "enforce", "quiet"], default: "observe" },
+      activationBriefEnabled: { type: "boolean", default: true },
       warnThreshold: { type: "number", minimum: 0, maximum: 100, default: 30 },
       holdThreshold: { type: "number", minimum: 1, maximum: 100, default: 60 },
       throttleWindowMs: { type: "number", minimum: 0, default: 300000 },

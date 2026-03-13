@@ -50,7 +50,7 @@ npm view clawseatbelt dist-tags --json
 Then verify install in a disposable OpenClaw instance:
 
 ```bash
-openclaw plugins install clawseatbelt@0.1.2
+openclaw plugins install clawseatbelt@0.1.3
 openclaw config set --strict-json plugins.allow '["clawseatbelt"]'
 openclaw config set --strict-json plugins.entries.clawseatbelt.enabled true
 openclaw gateway restart
@@ -77,7 +77,7 @@ Required GitHub configuration:
 Recommended flow:
 
 1. Merge the release commit to `main`.
-2. Create and push a tag like `v0.1.2`.
+2. Create and push a tag like `v0.1.3`.
 3. Let GitHub Actions run CI, then publish to npm.
 4. If the publish run fails with `Unable to authenticate`, re-check the npm trusted publisher fields exactly. npm matches repository and workflow filename case-sensitively.
 

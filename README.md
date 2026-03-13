@@ -11,13 +11,15 @@ ClawSeatbelt is built for the exact high-intent searches OpenClaw users already 
 ## Install In Two Minutes
 
 ```bash
-openclaw plugins install clawseatbelt@0.1.2
+openclaw plugins install clawseatbelt@0.1.3
 openclaw config set --strict-json plugins.allow '["clawseatbelt"]'
 openclaw config set --strict-json plugins.entries.clawseatbelt.enabled true
 openclaw gateway restart
 ```
 
 The plugin loads after the gateway restart. On a fresh OpenClaw home, the install step may briefly warn that `plugins.allow` is empty before the allowlist command runs. That is expected on first install. If OpenClaw also prints unrelated doctor warnings, such as Telegram policy warnings, those come from the existing OpenClaw config rather than ClawSeatbelt.
+
+After the restart, the next normal assistant reply should carry one short activation brief so the install does not vanish into silence. If you prefer zero install-time copy, switch to `quiet` mode or set `activationBriefEnabled` to `false`.
 
 Suggested starting config:
 
@@ -42,6 +44,8 @@ Start in `observe`. Let it collect signal first. Move to `enforce` once the find
 
 ## Prove Value In Five Minutes
 
+After the gateway comes back, ask the assistant one normal question once. ClawSeatbelt should introduce itself with a brief trust note, current mode, and the right next command.
+
 Run these inside OpenClaw:
 
 ```bash
@@ -55,6 +59,25 @@ If you want something ready to forward to a teammate, support thread, issue, or 
 ```bash
 /clawseatbelt-proofpack --target pr-comment --audience public
 ```
+
+If you want the lightest share-safe receipt right after install, use:
+
+```bash
+/clawseatbelt-proofpack --target chat --audience public
+```
+
+Telegram note:
+
+- Telegram bot commands allow only lowercase letters, digits, and underscores.
+- ClawSeatbelt maps short Telegram-safe aliases automatically:
+  - `/csb_status`
+  - `/csb_mode`
+  - `/csb_scan`
+  - `/csb_explain`
+  - `/csb_proof`
+  - `/csb_answer`
+  - `/csb_check`
+- Use the `csb_*` form on Telegram. Keep the canonical `clawseatbelt-*` names for other OpenClaw surfaces.
 
 ## Why OpenClaw Users Choose ClawSeatbelt
 
@@ -195,6 +218,7 @@ npm run verify:openclaw-lab
 - [docs/benchmarks/openclaw-competitor-lab.md](docs/benchmarks/openclaw-competitor-lab.md)
 - [docs/benchmarks/openclaw-install-verification.md](docs/benchmarks/openclaw-install-verification.md)
 - [docs/architecture/system-overview.md](docs/architecture/system-overview.md)
+- [docs/architecture/activation-brief.md](docs/architecture/activation-brief.md)
 - [docs/architecture/competitor-lab.md](docs/architecture/competitor-lab.md)
 - [docs/architecture/openclaw-lab-verifier.md](docs/architecture/openclaw-lab-verifier.md)
 - [docs/architecture/local-deploy.md](docs/architecture/local-deploy.md)

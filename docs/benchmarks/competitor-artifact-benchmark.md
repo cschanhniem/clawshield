@@ -25,7 +25,7 @@ This is an artifact and integration benchmark, not a runtime efficacy shootout. 
 
 | Package | Version | Package Footprint | Package Surface | External Requirement | Verified Notes |
 |---|---:|---:|---|---|---|
-| ClawSeatbelt | 0.1.2 | ~32.2 KB tarball, ~130.9 KB unpacked package | local plugin core | none | `openclaw.extensions` points to `dist/openclaw.js`; no runtime deps |
+| ClawSeatbelt | 0.1.3 | ~34.7 KB tarball, ~141.4 KB unpacked package | local plugin core | none | `openclaw.extensions` points to `dist/openclaw.js`; no runtime deps |
 | MoltGuard | 6.8.21 | 7.1 MB | plugin + gateway + dashboard + scripts | OpenGuardrails Core account/quota | README states auto-registration with Core and 500 free checks/day |
 | SecureClaw | 2.2.0 | 472 KB | plugin + skill + shell scripts + IOC/templates | none for baseline | README advertises audits, hardening, background monitors, and script-heavy skill deployment |
 | PolicyShield | 0.14.0 | 24 KB | thin plugin client | PolicyShield server | README defaults to `http://localhost:8100`, YAML rules, fail-open option |

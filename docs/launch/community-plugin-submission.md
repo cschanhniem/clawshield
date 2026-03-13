@@ -39,7 +39,7 @@ ClawSeatbelt is the trust plugin OpenClaw users can install first without adding
 ## Install
 
 ```bash
-openclaw plugins install clawseatbelt@0.1.2
+openclaw plugins install clawseatbelt@0.1.3
 ```
 
 After install, pin `plugins.allow`, enable the plugin entry, and restart the OpenClaw gateway before first use.

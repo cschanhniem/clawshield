@@ -21,7 +21,9 @@ export class ClawSeatbeltRuntimeState {
   private readonly evaluationCache = new Map<string, RiskEvaluation>();
   private readonly sessionRisk = new Map<string, SessionRiskSnapshot>();
   private readonly notificationGate = new Map<string, { fingerprint: string; lastEmittedAt: number; suppressedCount: number }>();
+  private readonly activationBriefGate = new Map<string, number>();
   private readonly incidents: IncidentRecord[] = [];
+  private activationBriefSuppressed = false;
   private modeOverride: RuntimeMode | undefined;
 
   constructor(private readonly config: ClawSeatbeltConfig) {}
@@ -102,6 +104,25 @@ export class ClawSeatbeltRuntimeState {
     return { notify: false, suppressedCount: gate.suppressedCount };
   }
 
+  consumeActivationBrief(sessionKey: string | undefined): boolean {
+    this.cleanup();
+    if (this.activationBriefSuppressed) {
+      return false;
+    }
+
+    const key = sessionKey ?? "__global__";
+    if (this.activationBriefGate.has(key)) {
+      return false;
+    }
+
+    this.activationBriefGate.set(key, Date.now());
+    return true;
+  }
+
+  markActivationBriefSeen(): void {
+    this.activationBriefSuppressed = true;
+  }
+
   getRecentIncidents(limit: number): IncidentRecord[] {
     this.cleanup();
     return this.incidents.slice(-limit).reverse();
@@ -143,6 +164,12 @@ export class ClawSeatbeltRuntimeState {
     for (const [key, gate] of this.notificationGate.entries()) {
       if (gate.lastEmittedAt < cutoff) {
         this.notificationGate.delete(key);
+      }
+    }
+
+    for (const [key, activatedAt] of this.activationBriefGate.entries()) {
+      if (activatedAt < cutoff) {
+        this.activationBriefGate.delete(key);
       }
     }
 

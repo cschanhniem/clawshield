@@ -5,7 +5,7 @@ This is the fastest path from install to first proof with ClawSeatbelt.
 ## 1. Install The Plugin
 
 ```bash
-openclaw plugins install clawseatbelt@0.1.2
+openclaw plugins install clawseatbelt@0.1.3
 openclaw config set --strict-json plugins.allow '["clawseatbelt"]'
 openclaw config set --strict-json plugins.entries.clawseatbelt.enabled true
 openclaw gateway restart
@@ -66,7 +66,27 @@ Use a conservative first configuration:
 
 `observe` is the right first step for most OpenClaw users. Let it collect signal before you ask it to block.
 
-## 4. Check Your Posture
+## 4. Watch For The Activation Brief
+
+After the gateway restart, ask OpenClaw one normal question. The next assistant reply should include a short ClawSeatbelt activation brief with the current mode, a posture summary, and the next proof or share path.
+
+If you want full silence on install, either use `quiet` mode or set:
+
+```json
+{
+  "plugins": {
+    "entries": {
+      "clawseatbelt": {
+        "config": {
+          "activationBriefEnabled": false
+        }
+      }
+    }
+  }
+}
+```
+
+## 5. Check Your Posture
 
 Run:
 
@@ -80,6 +100,8 @@ For machine-readable posture output or first-party audit ingestion:
 /clawseatbelt-status --json --audit-file ./openclaw-audit.json --write-snapshot ./clawseatbelt-posture.json
 ```
 
+If you are operating through Telegram, use `/csb_status` instead. Telegram bot commands do not accept hyphens.
+
 You should see a compact posture summary that explains:
 
 - current runtime mode
@@ -88,7 +110,7 @@ You should see a compact posture summary that explains:
 
 If you pass a prior snapshot with `--diff-file`, ClawSeatbelt will show whether trust posture improved or regressed.
 
-## 5. Get First Proof Fast
+## 6. Get First Proof Fast
 
 Run:
 
@@ -98,7 +120,7 @@ Run:
 
 This is the fastest proof loop on a clean install. It checks that the local protection layers are wired, then points the operator back toward real posture and skill work.
 
-## 6. Scan Skills Before You Trust Them
+## 7. Scan Skills Before You Trust Them
 
 Run:
 
@@ -111,7 +133,7 @@ Use this before enabling a skill, especially if the bundle pulls remote scripts,
 The current scanner also flags unpinned installers, `latest` or branch-based installs, `preinstall` or `postinstall` hooks, and setup steps that widen OpenClaw permissions.
 
 
-## 7. Export A Share-Safe Proof Pack
+## 8. Export A Share-Safe Proof Pack
 
 Once you have posture and scan signal, render a packet you can forward without cleanup:
 
@@ -127,7 +149,13 @@ For a one-paragraph recommendation answer:
 
 These surfaces are built for support threads, PRs, issues, and team handoffs. Public mode keeps secrets and local paths out of the artifact by default.
 
-## 8. Move To Enforce When The Signal Is Clean
+If you want the lightest share path right after first proof:
+
+```bash
+/clawseatbelt-proofpack --target chat --audience public
+```
+
+## 9. Move To Enforce When The Signal Is Clean
 
 After a low-noise soak, switch to:
 
@@ -147,6 +175,7 @@ After a low-noise soak, switch to:
 - `clawseatbelt-answer --target <support|pr-review|issue|team> --audience <public|internal|private>`
 - `clawseatbelt-challenge --target <markdown|pr-comment|issue-comment|chat> --audience <public|internal|private>`
 - Use the slash form inside OpenClaw chat, for example `/clawseatbelt-status`.
+- On Telegram, use the native aliases instead: `/csb_status`, `/csb_mode`, `/csb_scan`, `/csb_explain`, `/csb_proof`, `/csb_answer`, `/csb_check`.
 - For local deployment, use `npm run deploy:local` or `npm run deploy:local:pack` from the repository root.
 
 ## Best Pairings With Native OpenClaw Security

@@ -42,6 +42,12 @@ Point people to one fast check:
 /clawseatbelt-status
 ```
 
+If the release matters to Telegram users, call out the Telegram-safe alias too:
+
+```bash
+/csb_status
+```
+
 If the release improved proof or recommendation surfaces, also call out:
 
 ```bash

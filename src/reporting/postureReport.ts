@@ -1,4 +1,5 @@
 import { maxSeverity, severityFromScore } from "../core/severity.js";
+import { renderStatusNextStep } from "./activationBrief.js";
 import type {
   Finding,
   PostureDiff,
@@ -310,7 +311,8 @@ export function renderPostureCard(
   const sections = [
     `ClawSeatbelt mode: ${mode}. ${snapshot.shareMessage}`,
     topFacets.length > 0 ? `Focus: ${topFacets.join(" ")}` : "Focus: No active posture hotspots.",
-    recentIncidents.length > 0 ? `Recent: ${recentIncidents.join("; ")}` : "Recent: No recent high-signal incidents."
+    recentIncidents.length > 0 ? `Recent: ${recentIncidents.join("; ")}` : "Recent: No recent high-signal incidents.",
+    renderStatusNextStep()
   ];
 
   const diffHeadline = formatDiffHeadline(diff);

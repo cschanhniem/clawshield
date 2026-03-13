@@ -11,7 +11,8 @@ stateDiagram-v2
   [*] --> Unaware
   Unaware --> Curious: sees status card, skill memo, or benchmark artifact
   Curious --> Installed: installs plugin
-  Installed --> FirstProof: runs status, scan, diff, or challenge
+  Installed --> Activated: first reply confirms plugin is live
+  Activated --> FirstProof: runs status, scan, diff, or challenge
   FirstProof --> Trusted: gets a clear finding or calm clean bill
   Trusted --> Shared: exports share-safe artifact
   Shared --> TrialByPeer: peer or teammate tries it
@@ -31,7 +32,9 @@ sequenceDiagram
   participant Export as Share Export Layer
   participant Peer
 
-  Operator->>Plugin: Install and run status, scan, or challenge
+  Operator->>Plugin: Install plugin and ask first normal question
+  Plugin-->>Operator: one-time activation brief with proof and share path
+  Operator->>Plugin: Run status, scan, or challenge
   Plugin->>Plugin: Build typed findings and remediation
   Plugin->>Export: Request share artifact
   Export->>Export: Redact secrets, hostnames, tokens, and unstable IDs
@@ -50,21 +53,24 @@ flowchart LR
   C[skill bundle] --> E
   D[message and tool results] --> E
   E --> F[typed findings]
-  F --> G[posture summaries]
-  F --> H[skill approval memos]
-  F --> I[benchmark challenge reports]
-  G --> J[share export layer]
-  H --> J
-  I --> J
-  J --> K[PR comment]
-  J --> L[issue or ticket]
-  J --> M[team chat]
-  J --> N[community post or demo]
+  F --> G[activation brief]
+  F --> H[posture summaries]
+  F --> I[skill approval memos]
+  F --> J[benchmark challenge reports]
+  G --> K[first-session reply]
+  H --> L[share export layer]
+  I --> L
+  J --> L
+  L --> M[PR comment]
+  L --> N[issue or ticket]
+  L --> O[team chat]
+  L --> P[community post or demo]
 ```
 
 ## Design Guardrails
 
 - Shared artifacts must be useful even if the recipient never installs the plugin.
+- Installed operators should get one calm activation cue before ClawSeatbelt disappears into the background.
 - Redaction must run before any share export is rendered.
 - Share paths must be explicit and user-driven. No auto-posting.
 - Install hints belong in the footer, not as the whole artifact.

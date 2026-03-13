@@ -26,10 +26,11 @@ Security products do not spread because they ask to be shared. They spread becau
 That is the growth loop ClawSeatbelt should own:
 
 1. A user installs the plugin and gets a useful trust receipt fast.
-2. The receipt explains posture, risk, and next steps in clean language.
-3. The user shares that artifact in a thread, issue, PR, or team chat to resolve a real decision.
-4. The recipient sees the evidence, the remediation path, and the install path in one place.
-5. The recipient installs ClawSeatbelt and repeats the loop.
+2. The next assistant reply confirms the plugin is active and points to the right first proof.
+3. The receipt explains posture, risk, and next steps in clean language.
+4. The user shares that artifact in a thread, issue, PR, or team chat to resolve a real decision.
+5. The recipient sees the evidence, the remediation path, and the install path in one place.
+6. The recipient installs ClawSeatbelt and repeats the loop.
 
 This is the only kind of "viral hack" worth building here. It is not spam. It is not nagware. It is not forced referral logic. It is product-led distribution through useful proof.
 
@@ -72,7 +73,8 @@ If ClawSeatbelt is going to spread, it has to spread with taste. That means ever
 
 - live runtime proof inside a disposable OpenClaw instance
 - side-by-side competitor benchmark evidence
-- deeper skill supply-chain inspection and install-time UX
+- deeper skill supply-chain inspection
+- richer install-time activation beyond the current one-brief path
 - first-class posture orchestration around `openclaw security audit --json`, tool policy, exec approvals, pairing, and allowlists
 - stronger provenance and release trust signals
 - distribution proof: npm publication, community listing, and operator adoption loop
@@ -176,7 +178,8 @@ stateDiagram-v2
   [*] --> Unaware
   Unaware --> Curious: sees report or benchmark artifact
   Curious --> Installed: installs plugin
-  Installed --> FirstProof: runs status, scan, or challenge
+  Installed --> Activated: first reply confirms plugin is live
+  Activated --> FirstProof: runs status, scan, or challenge
   FirstProof --> Trusted: sees clear value
   Trusted --> Shared: exports share-safe artifact
   Shared --> TeamTrial: peer or teammate tries it

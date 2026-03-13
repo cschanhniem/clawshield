@@ -2,6 +2,7 @@ import { buildPinnedInstallCommand } from "../core/productMetadata.js";
 import { redactToolResult } from "../core/redactionEngine.js";
 import { evaluateInboundMessage } from "../core/riskEngine.js";
 import { evaluateSkillRules } from "../rules/skillRules.js";
+import { renderChallengeNextStep } from "./activationBrief.js";
 import { sanitizeShareText, type ShareAudience, type ShareTarget } from "./shareExport.js";
 
 export interface ChallengeCheckResult {
@@ -78,6 +79,7 @@ export function renderChallengeReport(
   }
 ): string {
   const installFooter = `Install with \`${buildPinnedInstallCommand()}\`.`;
+  const nextStep = sanitizeShareText(renderChallengeNextStep(), options.audience);
   const checks = report.checks.map(
     (check) =>
       `- ${check.label}: ${sanitizeShareText(check.verdict, options.audience)} Evidence: ${sanitizeShareText(check.evidence, options.audience)}`
@@ -88,6 +90,7 @@ export function renderChallengeReport(
       `ClawSeatbelt trust challenge: ${sanitizeShareText(report.headline, options.audience)}.`,
       sanitizeShareText(report.summary, options.audience),
       checks.join(" "),
+      nextStep,
       "Use this as first proof, not as a substitute for live benchmarks.",
       installFooter
     ].join(" ");
@@ -100,6 +103,7 @@ export function renderChallengeReport(
     sanitizeShareText(report.summary, options.audience),
     "Checks:",
     checks.join("\n"),
+    nextStep,
     "Use this as first proof, not as a substitute for live benchmarks.",
     installFooter
   ].join("\n\n");

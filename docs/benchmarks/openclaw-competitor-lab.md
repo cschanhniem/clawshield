@@ -1,6 +1,6 @@
 # OpenClaw Competitor Lab
 
-Generated at: 2026-03-13T05:15:11.360Z
+Generated at: 2026-03-13T06:15:32.391Z
 OpenClaw version: 2026.3.11
 
 ## Method
@@ -14,7 +14,7 @@ OpenClaw version: 2026.3.11
 
 | Package | Version | Packed Size | Hooks | Commands | Local-First Baseline | Install Warning | Notable Signal |
 |---|---:|---:|---:|---:|---|---|---|
-| ClawSeatbelt | 0.1.2 | 32232 B | 5 | 7 | yes | no | Clean local baseline |
+| ClawSeatbelt | 0.1.3 | 34727 B | 5 | 7 | yes | no | Clean local baseline |
 | MoltGuard | 6.8.21 | 1697329 B | 24 | 9 | no | no | Hosted service or account signal |
 | SecureClaw | 2.2.0 | 102921 B | 1 | 1 | yes | yes | Installer flagged dangerous patterns |
 | PolicyShield | 0.14.0 | 6999 B | 3 | 0 | no | no | Server dependency signal |

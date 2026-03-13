@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { isAbsolute, resolve, sep } from "node:path";
 import { renderDefaultAnswer, type DefaultAnswerTarget } from "../reporting/defaultAnswer.js";
+import { renderActivationBrief } from "../reporting/activationBrief.js";
 import { renderChallengeReport, runTrustChallenge } from "../reporting/challengeReport.js";
 import { normalizeOpenClawAuditReport } from "../reporting/openClawAudit.js";
 import { buildPostureSummary, parsePostureSnapshot } from "../reporting/postureReport.js";
@@ -11,6 +12,7 @@ import type { OpenClawAuditReport, PostureSnapshot, PostureSummary, RiskEvaluati
 import type {
   OpenClawPluginApiLike,
   PluginCommandContext,
+  OpenClawPluginCommandDefinition,
   PluginHookBeforePromptBuildResult,
   PluginHookBeforeToolCallResult,
   PluginHookMessageSendingResult,
@@ -22,6 +24,7 @@ import type { ClawSeatbeltConfig, RuntimeMode } from "./config.js";
 import { evaluateInboundMessage } from "./riskEngine.js";
 import { redactToolResult, redactUnknownValue } from "./redactionEngine.js";
 import { ClawSeatbeltRuntimeState } from "./runtimeState.js";
+import { buildSlashCommand, CLAWSEATBELT_COMMANDS, resolveCommandName } from "./productMetadata.js";
 
 function resolveSessionKey(parts: Array<string | undefined>): string | undefined {
   const filtered = parts.filter((part): part is string => Boolean(part));
@@ -73,6 +76,18 @@ function buildGuardrailContext(
 
 function buildReply(text: string, isError = false): ReplyPayload {
   return { text, isError };
+}
+
+function rewriteSlashCommandReferences(text: string, channel?: string): string {
+  if (channel?.toLowerCase() !== "telegram") {
+    return text;
+  }
+
+  let rewritten = text;
+  for (const key of Object.keys(CLAWSEATBELT_COMMANDS) as Array<keyof typeof CLAWSEATBELT_COMMANDS>) {
+    rewritten = rewritten.replaceAll(buildSlashCommand(key), buildSlashCommand(key, channel));
+  }
+  return rewritten;
 }
 
 function isReplyPayload(value: unknown): value is ReplyPayload {
@@ -350,55 +365,48 @@ export class ClawSeatbeltRuntime {
       }
     });
 
-    this.api.registerCommand({
-      name: "clawseatbelt-status",
+    this.registerCommand("status", {
       description: "Show recent ClawSeatbelt posture and runtime mode",
       requireAuth: true,
       handler: (ctx) => this.handleStatus(ctx)
     });
 
-    this.api.registerCommand({
-      name: "clawseatbelt-mode",
+    this.registerCommand("mode", {
       description: "Temporarily set ClawSeatbelt runtime mode: observe, enforce, or quiet",
       requireAuth: true,
       acceptsArgs: true,
       handler: (ctx) => this.handleMode(ctx)
     });
 
-    this.api.registerCommand({
-      name: "clawseatbelt-scan",
+    this.registerCommand("scan", {
       description: "Scan a local skill directory for supply-chain risk",
       requireAuth: true,
       acceptsArgs: true,
       handler: (ctx) => this.handleScan(ctx)
     });
 
-    this.api.registerCommand({
-      name: "clawseatbelt-explain",
+    this.registerCommand("explain", {
       description: "Explain a recent finding ID and its operator impact",
       requireAuth: true,
       acceptsArgs: true,
       handler: (ctx) => this.handleExplain(ctx)
     });
 
-    this.api.registerCommand({
-      name: "clawseatbelt-proofpack",
+    this.registerCommand("proofpack", {
       description: "Render a share-safe proof pack for PRs, issues, or chat",
       requireAuth: true,
       acceptsArgs: true,
       handler: (ctx) => this.handleProofPack(ctx)
     });
 
-    this.api.registerCommand({
-      name: "clawseatbelt-answer",
+    this.registerCommand("answer", {
       description: "Render a concise recommendation-ready answer with local proof",
       requireAuth: true,
       acceptsArgs: true,
       handler: (ctx) => this.handleAnswer(ctx)
     });
 
-    this.api.registerCommand({
-      name: "clawseatbelt-challenge",
+    this.registerCommand("challenge", {
       description: "Run a built-in trust challenge with synthetic local samples",
       requireAuth: true,
       acceptsArgs: true,
@@ -419,7 +427,22 @@ export class ClawSeatbeltRuntime {
     this.api.on("tool_result_persist", (event) => this.beforeToolPersist(event.message));
   }
 
+  private registerCommand(
+    key: keyof typeof CLAWSEATBELT_COMMANDS,
+    definition: Omit<OpenClawPluginCommandDefinition, "name" | "nativeNames">
+  ): void {
+    this.api.registerCommand({
+      name: CLAWSEATBELT_COMMANDS[key].canonical,
+      nativeNames: {
+        telegram: CLAWSEATBELT_COMMANDS[key].telegram
+      },
+      ...definition
+    });
+  }
+
   private handleStatus(ctx: PluginCommandContext): ReplyPayload {
+    this.state.markActivationBriefSeen();
+
     const parsed = parseStatusArgs(ctx.args);
     if (parsed.error || !parsed.options) {
       return buildReply(parsed.error ?? "Invalid status options.", true);
@@ -459,10 +482,12 @@ export class ClawSeatbeltRuntime {
     }
 
     const suffix = snapshotPath ? ` Snapshot written to ${snapshotPath}.` : "";
-    return buildReply(`${card}${suffix}`);
+    return buildReply(rewriteSlashCommandReferences(`${card}${suffix}`, ctx.channel));
   }
 
   private handleMode(ctx: PluginCommandContext): ReplyPayload {
+    this.state.markActivationBriefSeen();
+
     const requested = ctx.args?.trim();
     if (!requested) {
       return buildReply(`Current mode: ${this.state.getEffectiveMode()}. Pass observe, enforce, or quiet.`);
@@ -475,6 +500,8 @@ export class ClawSeatbeltRuntime {
   }
 
   private handleScan(ctx: PluginCommandContext): ReplyPayload {
+    this.state.markActivationBriefSeen();
+
     const raw = ctx.args?.trim();
     if (!raw) {
       return buildReply("Provide a path to a skill directory.", true);
@@ -503,9 +530,14 @@ export class ClawSeatbeltRuntime {
   }
 
   private handleExplain(ctx: PluginCommandContext): ReplyPayload {
+    this.state.markActivationBriefSeen();
+
     const findingId = ctx.args?.trim();
     if (!findingId) {
-      return buildReply("Provide a finding ID, for example clawseatbelt-explain cfg-exec-full.", true);
+      return buildReply(
+        `Provide a finding ID, for example ${resolveCommandName("explain", ctx.channel)} cfg-exec-full.`,
+        true
+      );
     }
 
     const configFinding = assessOpenClawConfiguration(this.api.config).find((finding) => finding.id === findingId);
@@ -528,6 +560,8 @@ export class ClawSeatbeltRuntime {
   }
 
   private handleProofPack(ctx: PluginCommandContext): ReplyPayload {
+    this.state.markActivationBriefSeen();
+
     const parsed = parseProofPackArgs(ctx.args);
     if (parsed.error || !parsed.options) {
       return buildReply(parsed.error ?? "Invalid proof-pack options.", true);
@@ -554,6 +588,8 @@ export class ClawSeatbeltRuntime {
   }
 
   private handleAnswer(ctx: PluginCommandContext): ReplyPayload {
+    this.state.markActivationBriefSeen();
+
     const parsed = parseAnswerArgs(ctx.args);
     if (parsed.error || !parsed.options) {
       return buildReply(parsed.error ?? "Invalid answer options.", true);
@@ -573,6 +609,7 @@ export class ClawSeatbeltRuntime {
       audience: parsed.options.audience,
       target: parsed.options.target,
       mode: posture.mode,
+      channel: ctx.channel,
       skillScan
     });
 
@@ -580,6 +617,8 @@ export class ClawSeatbeltRuntime {
   }
 
   private handleChallenge(ctx: PluginCommandContext): ReplyPayload {
+    this.state.markActivationBriefSeen();
+
     const parsed = parseChallengeArgs(ctx.args);
     if (parsed.error || !parsed.options) {
       return buildReply(parsed.error ?? "Invalid challenge options.", true);
@@ -590,30 +629,38 @@ export class ClawSeatbeltRuntime {
       target: parsed.options.target
     });
 
-    return this.writeArtifactReply(report, parsed.options.writeFile, "challenge report");
+    return this.writeArtifactReply(
+      rewriteSlashCommandReferences(report, ctx.channel),
+      parsed.options.writeFile,
+      "challenge report"
+    );
   }
 
   private beforePromptBuild(prompt: string, sessionKey: string | undefined): PluginHookBeforePromptBuildResult | void {
     const evaluation = this.state.evaluateCached(prompt, () => evaluateInboundMessage(prompt));
     const key = sessionKey ?? this.state.fingerprint(prompt);
     this.state.recordSessionRisk(key, evaluation);
-
-    if (evaluation.score < this.config.warnThreshold) {
-      return;
-    }
-
     const mode = this.state.getEffectiveMode();
-    if (mode === "quiet") {
-      return;
+    const contexts: string[] = [];
+
+    const activationBrief = this.buildActivationBrief(sessionKey);
+    if (activationBrief) {
+      contexts.push(activationBrief);
     }
 
-    const notify = this.state.shouldNotify(key, this.state.fingerprint(prompt));
-    if (!notify.notify) {
+    if (evaluation.score >= this.config.warnThreshold && mode !== "quiet") {
+      const notify = this.state.shouldNotify(key, this.state.fingerprint(prompt));
+      if (notify.notify) {
+        contexts.unshift(buildGuardrailContext(evaluation, mode, notify.suppressedCount));
+      }
+    }
+
+    if (contexts.length === 0) {
       return;
     }
 
     return {
-      prependContext: buildGuardrailContext(evaluation, mode, notify.suppressedCount)
+      prependContext: contexts.join(" ")
     };
   }
 
@@ -673,6 +720,33 @@ export class ClawSeatbeltRuntime {
       return;
     }
     return { message: sanitized.value };
+  }
+
+  private buildActivationBrief(sessionKey: string | undefined): string | undefined {
+    if (!this.config.activationBriefEnabled) {
+      return undefined;
+    }
+
+    const mode = this.state.getEffectiveMode();
+    if (mode === "quiet") {
+      return undefined;
+    }
+
+    if (!this.state.consumeActivationBrief(sessionKey)) {
+      return undefined;
+    }
+
+    const summary = buildPostureSummary(
+      {
+        configurationFindings: assessOpenClawConfiguration(this.api.config)
+      },
+      {
+        mode,
+        recentIncidents: []
+      }
+    );
+
+    return renderActivationBrief(summary, mode);
   }
 
   private safeResolvePath(input: string): string {

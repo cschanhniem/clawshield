@@ -14,9 +14,10 @@ ClawSeatbelt is split into a small, fast hot path and a slower analysis path. Th
 - `Proof Pack Composer`: bundles trust artifacts into recommendation-ready operator packets.
 - `Compounding Moat Loop`: turns proof artifacts, public references, and corpus contributions into stronger future releases.
 - `Default Answer Engine`: packages proof into short recommendation-ready answers for threads, reviews, and team handoffs.
+- `Activation Brief Renderer`: injects one calm, first-session trust brief so a fresh install does not disappear into silence.
 - `Trust Challenge Runner`: exercises core defenses with safe synthetic samples for first-proof installs.
 - `Benchmark Harness`: runs a shared local corpus and records current package-level comparison context.
-- `Plugin Adapter`: OpenClaw-facing hooks and commands via `api.on(...)`, `registerCommand(...)`, and `registerService(...)`.
+- `Plugin Adapter`: OpenClaw-facing hooks and commands via `api.on(...)`, `registerCommand(...)`, `registerService(...)`, and channel-native command aliases where the transport requires them.
 
 ## System State Machine
 
@@ -25,6 +26,8 @@ stateDiagram-v2
   [*] --> Idle
   Idle --> ReceivingMessage: message_received
   ReceivingMessage --> EvaluatingPrompt: before_prompt_build
+  EvaluatingPrompt --> ActivatingOperator: first eligible session after install or restart
+  ActivatingOperator --> EvaluatingPrompt: one-time activation brief injected
   EvaluatingPrompt --> GuardingToolCall: before_tool_call
   GuardingToolCall --> RedactingOutbound: message_sending
   RedactingOutbound --> RedactingToolResult: tool_result_persist
@@ -53,6 +56,7 @@ sequenceDiagram
   participant ProofPack as Proof Pack Composer
   participant Moat as Compounding Moat Loop
   participant Answer as Default Answer Engine
+  participant Brief as Activation Brief Renderer
   participant Challenge as Trust Challenge Runner
   participant Benchmark as Benchmark Harness
 
@@ -62,7 +66,11 @@ sequenceDiagram
   Adapter->>State: cache + throttle + remember session risk
   Channel->>Adapter: before_prompt_build
   Adapter->>Risk: evaluate(prompt)
-  Adapter-->>Channel: prepend guard context when needed
+  Adapter->>Report: build local posture preview when first eligible
+  Report-->>Adapter: summary headline and first action
+  Adapter->>Brief: compose one-time activation brief
+  Brief-->>Adapter: mode, proof path, share path
+  Adapter-->>Channel: prepend guard context and activation brief when needed
   Channel->>Adapter: before_tool_call
   Adapter->>State: resolve session risk
   Adapter-->>Channel: allow or block dangerous tools
@@ -100,8 +108,11 @@ flowchart LR
   J --> E
   L[OpenClaw audit JSON] --> M[Audit Ingestor]
   M --> E
+  U[Activation brief gate] --> V[Activation Brief Renderer]
   N[Previous snapshot] --> E
   E --> O[Share Export Layer]
+  E --> V
+  V --> K
   O --> P[Proof Pack Composer]
   P --> Q[Compounding Moat Loop]
   Q --> R[Default Answer Engine]

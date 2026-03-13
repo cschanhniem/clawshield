@@ -20,19 +20,20 @@ Start here, in order:
 4. [docs/product/positioning.md](docs/product/positioning.md)
 5. [docs/architecture/system-overview.md](docs/architecture/system-overview.md)
 6. [docs/architecture/trust-loop.md](docs/architecture/trust-loop.md)
-7. [docs/architecture/share-export-system.md](docs/architecture/share-export-system.md)
-8. [docs/architecture/proof-pack-system.md](docs/architecture/proof-pack-system.md)
-9. [docs/architecture/compounding-moat.md](docs/architecture/compounding-moat.md)
-10. [docs/architecture/default-answer-engine.md](docs/architecture/default-answer-engine.md)
-11. [docs/architecture/trust-challenge.md](docs/architecture/trust-challenge.md)
-12. [docs/architecture/benchmark-harness.md](docs/architecture/benchmark-harness.md)
-13. [docs/architecture/openclaw-lab-verifier.md](docs/architecture/openclaw-lab-verifier.md)
-14. [docs/architecture/competitor-lab.md](docs/architecture/competitor-lab.md)
-15. [docs/product/quickstart.md](docs/product/quickstart.md)
-16. [docs/benchmarks/competitor-artifact-benchmark.md](docs/benchmarks/competitor-artifact-benchmark.md)
-17. Latest task log in [tasks](tasks)
-18. [docs/architecture/local-deploy.md](docs/architecture/local-deploy.md)
-19. [marketing/no1-choice-plan.md](marketing/no1-choice-plan.md)
+7. [docs/architecture/activation-brief.md](docs/architecture/activation-brief.md)
+8. [docs/architecture/share-export-system.md](docs/architecture/share-export-system.md)
+9. [docs/architecture/proof-pack-system.md](docs/architecture/proof-pack-system.md)
+10. [docs/architecture/compounding-moat.md](docs/architecture/compounding-moat.md)
+11. [docs/architecture/default-answer-engine.md](docs/architecture/default-answer-engine.md)
+12. [docs/architecture/trust-challenge.md](docs/architecture/trust-challenge.md)
+13. [docs/architecture/benchmark-harness.md](docs/architecture/benchmark-harness.md)
+14. [docs/architecture/openclaw-lab-verifier.md](docs/architecture/openclaw-lab-verifier.md)
+15. [docs/architecture/competitor-lab.md](docs/architecture/competitor-lab.md)
+16. [docs/product/quickstart.md](docs/product/quickstart.md)
+17. [docs/benchmarks/competitor-artifact-benchmark.md](docs/benchmarks/competitor-artifact-benchmark.md)
+18. Latest task log in [tasks](tasks)
+19. [docs/architecture/local-deploy.md](docs/architecture/local-deploy.md)
+20. [marketing/no1-choice-plan.md](marketing/no1-choice-plan.md)
 
 ## Non-Negotiables
 
@@ -66,6 +67,7 @@ Start here, in order:
 - Update `plan.md` when status, sequencing, or scope changes.
 - Update `SKILL.md` when workflow, guardrails, or repo conventions evolve.
 - If a change affects adoption, recommendation, or operator sharing, update [docs/architecture/trust-loop.md](docs/architecture/trust-loop.md).
+- If a change affects install silence, first-reply activation, or the operator's first proof path, update [docs/architecture/activation-brief.md](docs/architecture/activation-brief.md).
 - If a change affects export rendering, copy structure, or share safety, update [docs/architecture/share-export-system.md](docs/architecture/share-export-system.md).
 - If a change affects multi-artifact exports, support-thread flows, or recommendation packets, update [docs/architecture/proof-pack-system.md](docs/architecture/proof-pack-system.md).
 - If a change affects corpus growth, public proof loops, or trust-safe measurement, update [docs/architecture/compounding-moat.md](docs/architecture/compounding-moat.md).

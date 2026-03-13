@@ -1,5 +1,12 @@
 # ClawSeatbelt Changelog
 
+## 0.1.3
+
+- Added a quiet one-time activation brief so operators see that ClawSeatbelt is live before the first explicit command.
+- Added Telegram-safe `csb_*` native command aliases while keeping the canonical `clawseatbelt-*` command family intact elsewhere.
+- Fixed pinned install metadata and share artifacts so recommendation output now stays aligned with the shipped package version.
+- Refreshed quickstart, maintainer, plugin-adapter, and release docs around first proof, gateway restart, and Telegram command behavior.
+
 ## 0.1.2
 
 - Fixed package-artifact verification on fresh runners by making `npm run pack:artifact` create `.tmp/pack` before calling `npm pack`.

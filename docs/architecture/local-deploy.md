@@ -60,6 +60,8 @@ sequenceDiagram
   Script-->>Dev: source path, commands, hooks, next step
   Dev->>OC: openclaw gateway restart
   OC->>Home: reload enabled plugins into the running gateway
+  Dev->>OC: ask a normal question once
+  OC-->>Dev: one-time activation brief in the next reply
   Dev->>OC: /clawseatbelt-status
 ```
 
@@ -76,6 +78,7 @@ flowchart LR
   G --> H[deploy summary]
   H --> I[gateway restart]
   I --> J[live plugin session]
+  J --> K[first-reply activation brief]
 ```
 
 ## Notes
@@ -84,4 +87,5 @@ flowchart LR
 - `pack` mode is the safer release rehearsal because it exercises the tarball OpenClaw actually installs.
 - OpenClaw can warn that `plugins.allow` is empty during the initial install before the allowlist write runs. That warning is transient on a clean first install.
 - The deploy script confirms install metadata immediately, but a running gateway still needs a restart before the plugin becomes active in the live session.
+- After the restart, the next normal assistant reply should include a one-time activation brief unless the operator immediately uses a ClawSeatbelt command first.
 - Local terminal publishing is a different path. If `publishConfig.provenance` is enabled, local `npm publish` fails with `provider: null` because there is no GitHub OIDC provider in a plain shell session.

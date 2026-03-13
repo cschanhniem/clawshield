@@ -1,6 +1,6 @@
 {
   "name": "clawseatbelt",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Local-first OpenClaw trust plugin for prompt-injection risk scoring, skill scanning, transcript hygiene, and posture reporting in minutes.",
   "homepage": "https://github.com/cschanhniem/ClawSeatbelt#readme",
   "bugs": {

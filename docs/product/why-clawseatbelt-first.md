@@ -85,7 +85,7 @@ That lab currently shows:
 ClawSeatbelt is also live on npm, so the first-install path is no longer hypothetical:
 
 ```bash
-openclaw plugins install clawseatbelt@0.1.2
+openclaw plugins install clawseatbelt@0.1.3
 openclaw config set --strict-json plugins.allow '["clawseatbelt"]'
 openclaw config set --strict-json plugins.entries.clawseatbelt.enabled true
 openclaw gateway restart

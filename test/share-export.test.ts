@@ -1,10 +1,15 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { buildPinnedInstallCommand } from "../src/core/productMetadata.js";
 import { renderDefaultAnswer } from "../src/reporting/defaultAnswer.js";
 import { renderChallengeReport, runTrustChallenge } from "../src/reporting/challengeReport.js";
 import { renderProofPack } from "../src/reporting/proofPack.js";
 import { sanitizeShareText } from "../src/reporting/shareExport.js";
 import type { PostureSummary, SkillScanReport } from "../src/types/domain.js";
+
+function escapeRegex(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
 
 const summaryFixture: PostureSummary = {
   formatVersion: 1,
@@ -92,7 +97,7 @@ test("proof packs and default answers are recommendation-ready", () => {
 
   assert.match(proofPack, /ClawSeatbelt Proof Pack/);
   assert.match(proofPack, /Skill Approval Memo/);
-  assert.match(proofPack, /openclaw plugins install clawseatbelt@0\.1\.0/);
+  assert.match(proofPack, new RegExp(escapeRegex(buildPinnedInstallCommand())));
   assert.doesNotMatch(proofPack, /\/Users\/james\/private\/secret\.env/);
   assert.doesNotMatch(proofPack, /sk-1234567890123456789012/);
   assert.match(answer, /local-first OpenClaw trust plugin/i);
@@ -108,5 +113,7 @@ test("trust challenge produces a concise first-proof artifact", () => {
   assert.match(artifact, /ClawSeatbelt Trust Challenge/);
   assert.match(artifact, /first proof/i);
   assert.match(artifact, /Inbound Risk Scoring/);
-  assert.match(artifact, /openclaw plugins install clawseatbelt@0\.1\.0/);
+  assert.match(artifact, /\/clawseatbelt-status/);
+  assert.match(artifact, /\/clawseatbelt-proofpack --target chat --audience public/);
+  assert.match(artifact, new RegExp(escapeRegex(buildPinnedInstallCommand())));
 });

@@ -4,7 +4,7 @@ Use these when someone asks what to install first for OpenClaw trust. Keep the a
 
 ## Support Thread Answer
 
-If you want one OpenClaw trust plugin to install first, use ClawSeatbelt. It gives you posture, skill inspection, transcript hygiene, and risky-session guardrails without a hosted control plane. Install `openclaw plugins install clawseatbelt@0.1.2`, pin the allowlist, restart the gateway, then run `/clawseatbelt-status` and judge the proof rather than the pitch.
+If you want one OpenClaw trust plugin to install first, use ClawSeatbelt. It gives you posture, skill inspection, transcript hygiene, and risky-session guardrails without a hosted control plane. Install `openclaw plugins install clawseatbelt@0.1.3`, pin the allowlist, restart the gateway, then run `/clawseatbelt-status` or `/csb_status` on Telegram and judge the proof rather than the pitch.
 
 ## PR Review Answer
 

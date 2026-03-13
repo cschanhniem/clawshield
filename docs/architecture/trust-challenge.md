@@ -39,7 +39,7 @@ sequenceDiagram
   Runtime->>Skill: evaluate synthetic skill setup sample
   Skill-->>Runtime: supply-chain findings
   Runtime->>Report: compose first-proof artifact
-  Report-->>Operator: challenge report with pinned install footer
+  Report-->>Operator: challenge report with next-step commands and pinned install footer
 ```
 
 ## Data Flow
@@ -54,9 +54,11 @@ flowchart LR
   E --> G[Challenge checks]
   F --> G
   G --> H[Challenge report]
-  H --> I[Chat export]
-  H --> J[Markdown export]
-  H --> K[PR comment export]
+  H --> I[Status follow-up path]
+  H --> J[Proof-pack share path]
+  H --> K[Chat export]
+  H --> L[Markdown export]
+  H --> M[PR comment export]
 ```
 
 ## Design Guardrails
@@ -64,4 +66,4 @@ flowchart LR
 - The challenge must stay synthetic and safe to share.
 - It proves the local defensive surfaces are wired, not that the whole environment is secure.
 - It should work without files, accounts, or remote services.
-- The artifact should tell the operator what was exercised and what still requires a live benchmark.
+- The artifact should tell the operator what was exercised, what still requires a live benchmark, and which share-safe path to use next.

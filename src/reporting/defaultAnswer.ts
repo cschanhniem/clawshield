@@ -1,3 +1,4 @@
+import { buildPinnedInstallCommand, buildSlashCommand } from "../core/productMetadata.js";
 import type { PostureSummary, SkillScanReport } from "../types/domain.js";
 import { sanitizeShareText, type ShareAudience } from "./shareExport.js";
 
@@ -7,6 +8,7 @@ interface DefaultAnswerOptions {
   audience: ShareAudience;
   target: DefaultAnswerTarget;
   mode: string;
+  channel?: string;
   skillScan?: SkillScanReport;
 }
 
@@ -25,7 +27,11 @@ function openingFor(target: DefaultAnswerTarget): string {
 }
 
 export function renderDefaultAnswer(summary: PostureSummary, options: DefaultAnswerOptions): string {
-  const firstStep = sanitizeShareText(summary.remediationSteps[0] ?? "Run /clawseatbelt-status and review the first proof.", options.audience);
+  const statusCommand = buildSlashCommand("status", options.channel);
+  const firstStep = sanitizeShareText(
+    summary.remediationSteps[0] ?? `Run ${statusCommand} and review the first proof.`,
+    options.audience
+  );
   const skillClause =
     options.skillScan && options.skillScan.findings.length > 0
       ? ` The attached skill memo also shows ${options.skillScan.findings.length} supply-chain finding(s), so it covers trust expansion before runtime as well.`
@@ -34,7 +40,7 @@ export function renderDefaultAnswer(summary: PostureSummary, options: DefaultAns
   return [
     openingFor(options.target),
     `The current local proof says ${sanitizeShareText(summary.headline, options.audience).toLowerCase()} with score ${summary.score}/100 in \`${options.mode}\` mode, and it covers posture, tool hygiene, transcript redaction, and skill trust without a hosted control plane.${skillClause}`,
-    `Install with \`openclaw plugins install clawseatbelt@0.1.0\`, run \`/clawseatbelt-status\`, and judge the attached proof pack rather than taking the claim on faith.`,
+    `Install with \`${buildPinnedInstallCommand()}\`, run \`${statusCommand}\`, and judge the attached proof pack rather than taking the claim on faith.`,
     `First action: ${firstStep}`
   ].join(" ");
 }

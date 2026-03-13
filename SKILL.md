@@ -22,20 +22,21 @@ ClawSeatbelt is a local-first trust layer for OpenClaw. The core shape is:
 1. Read [plan.md](plan.md) and the latest file in [tasks](tasks).
 2. Read the architecture doc that touches the subsystem you will edit.
 3. If the work affects adoption, status output, scanning output, or share flows, read [docs/architecture/trust-loop.md](docs/architecture/trust-loop.md).
-4. If the work affects export rendering or share modes, read [docs/architecture/share-export-system.md](docs/architecture/share-export-system.md).
-5. If the work affects bundles of shared artifacts or support-thread recommendation flows, read [docs/architecture/proof-pack-system.md](docs/architecture/proof-pack-system.md).
-6. If the work affects public proof, corpus growth, or measurement strategy, read [docs/architecture/compounding-moat.md](docs/architecture/compounding-moat.md).
-7. If the work affects recommendation copy, public answers, or maintainer-facing guidance, read [docs/architecture/default-answer-engine.md](docs/architecture/default-answer-engine.md).
-8. If the work affects first-proof challenge flows, read [docs/architecture/trust-challenge.md](docs/architecture/trust-challenge.md).
-9. If the work affects corpus benchmarking or comparison evidence, read [docs/architecture/benchmark-harness.md](docs/architecture/benchmark-harness.md).
-10. If the work affects package trust, disposable install checks, or allowlist pinning, read [docs/architecture/openclaw-lab-verifier.md](docs/architecture/openclaw-lab-verifier.md).
-11. If the work affects live competitor installs or category-proof claims, read [docs/architecture/competitor-lab.md](docs/architecture/competitor-lab.md).
-12. If the work affects local OpenClaw install loops or tarball rehearsal, read [docs/architecture/local-deploy.md](docs/architecture/local-deploy.md).
-13. If the work affects messaging, launch sequencing, or recommendation surfaces, read [marketing/no1-choice-plan.md](marketing/no1-choice-plan.md) and [marketing/message-map.md](marketing/message-map.md).
-14. Check which rubric in `plan.md` the work is meant to improve and which competitor it is meant to beat.
-15. Make the smallest coherent set of changes that improves the product materially.
-16. Update docs, diagrams, and task log in the same turn.
-17. Run verification for the surfaces you touched.
+4. If the work affects install silence, first-session activation, or the first proof path, read [docs/architecture/activation-brief.md](docs/architecture/activation-brief.md).
+5. If the work affects export rendering or share modes, read [docs/architecture/share-export-system.md](docs/architecture/share-export-system.md).
+6. If the work affects bundles of shared artifacts or support-thread recommendation flows, read [docs/architecture/proof-pack-system.md](docs/architecture/proof-pack-system.md).
+7. If the work affects public proof, corpus growth, or measurement strategy, read [docs/architecture/compounding-moat.md](docs/architecture/compounding-moat.md).
+8. If the work affects recommendation copy, public answers, or maintainer-facing guidance, read [docs/architecture/default-answer-engine.md](docs/architecture/default-answer-engine.md).
+9. If the work affects first-proof challenge flows, read [docs/architecture/trust-challenge.md](docs/architecture/trust-challenge.md).
+10. If the work affects corpus benchmarking or comparison evidence, read [docs/architecture/benchmark-harness.md](docs/architecture/benchmark-harness.md).
+11. If the work affects package trust, disposable install checks, or allowlist pinning, read [docs/architecture/openclaw-lab-verifier.md](docs/architecture/openclaw-lab-verifier.md).
+12. If the work affects live competitor installs or category-proof claims, read [docs/architecture/competitor-lab.md](docs/architecture/competitor-lab.md).
+13. If the work affects local OpenClaw install loops or tarball rehearsal, read [docs/architecture/local-deploy.md](docs/architecture/local-deploy.md).
+14. If the work affects messaging, launch sequencing, or recommendation surfaces, read [marketing/no1-choice-plan.md](marketing/no1-choice-plan.md) and [marketing/message-map.md](marketing/message-map.md).
+15. Check which rubric in `plan.md` the work is meant to improve and which competitor it is meant to beat.
+16. Make the smallest coherent set of changes that improves the product materially.
+17. Update docs, diagrams, and task log in the same turn.
+18. Run verification for the surfaces you touched.
 
 ## Decision Filter
 
@@ -67,6 +68,7 @@ Choose the path that is:
 - Every finding should carry severity, evidence, rationale, and remediation.
 - Operator-facing text must be concise and trustworthy.
 - When adding product surface, prefer the work that improves default-install trust, posture clarity, or skill supply-chain safety.
+- Do not let successful install flows end in silence. One calm activation cue is enough. Repeated nudges are not.
 - Growth mechanics must be opt-in, redacted, and evidence-led.
 - Major operator outputs should have a share-safe export path or a clear reason they do not.
 - Treat install warnings as first-class product failures, not as release footnotes.
