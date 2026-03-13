@@ -32,7 +32,7 @@ openclaw plugins install clawseatbelt@0.1.0
 
 ## Automated Publish
 
-This repo includes a release workflow that publishes on tags matching `v*`.
+This repo includes a release workflow that publishes on tags matching `v*` and also supports manual `workflow_dispatch` runs from GitHub Actions.
 
 Required GitHub repository secret:
 
@@ -44,6 +44,12 @@ Recommended flow:
 2. Create and push a tag like `v0.1.0`.
 3. Let GitHub Actions run CI, then publish to npm.
 4. If the publish run fails with `EOTP`, rotate `NPM_TOKEN` to an automation token and rerun the failed workflow.
+
+Manual fallback:
+
+1. Open the `Publish` workflow in GitHub Actions.
+2. Use `Run workflow` on `main` after fixing the npm secret.
+3. Confirm the package version in `package.json` is still unpublished before running it.
 
 ## If The Publish Fails
 

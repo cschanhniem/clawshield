@@ -9,6 +9,7 @@ Make the release path fit current open source publishing practice and capture th
 - Upgraded GitHub Actions usage to `actions/checkout@v6` and `actions/setup-node@v6`.
 - Added `id-token: write` to the publish workflow.
 - Switched release publishing to `npm publish --provenance`.
+- Added `workflow_dispatch` so a failed tag publish can be retried cleanly after fixing npm credentials.
 - Updated publish docs to require an npm automation token or trusted publishing for accounts that enforce write-time 2FA.
 
 ## Failure Captured
